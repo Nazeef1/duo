@@ -55,7 +55,7 @@ def compute_streak(user_id: int, db: Session) -> int:
     return streak
 
 @router.post("/lessons/{lesson_id}/attempts", response_model=schemas.StartAttemptResponse)
-def start_attempt(lesson_id: int, db: Session = Depends(get_db)):
+def start_attempt(lesson_id: int, is_legendary: bool = False, db: Session = Depends(get_db)):
     user_id = 1
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
@@ -76,6 +76,7 @@ def start_attempt(lesson_id: int, db: Session = Depends(get_db)):
         user_id=user_id,
         lesson_id=lesson_id,
         status="in_progress",
+        is_legendary=is_legendary,
         started_at=datetime.datetime.utcnow()
     )
     db.add(attempt)
@@ -148,16 +149,25 @@ def complete_attempt(attempt_id: int, db: Session = Depends(get_db)):
         attempt.status = "completed"
         attempt.completed_at = datetime.datetime.utcnow()
 
-    # Calculate XP
-    base_xp = 10
-    bonus_xp = 5 if attempt.hearts_lost == 0 else 0
+    # Calculate XP based on Legendary flag
+    if attempt.is_legendary:
+        base_xp = 40
+        bonus_xp = 10 if attempt.hearts_lost == 0 else 0
+        base_source = "legendary_lesson_complete"
+        bonus_source = "legendary_perfect_bonus"
+    else:
+        base_xp = 10
+        bonus_xp = 5 if attempt.hearts_lost == 0 else 0
+        base_source = "lesson_complete"
+        bonus_source = "perfect_lesson_bonus"
+
     total_xp_earned = base_xp + bonus_xp
     
     # Save transactions
-    base_tx = models.XPTransaction(user_id=user.id, amount=base_xp, source="lesson_complete")
+    base_tx = models.XPTransaction(user_id=user.id, amount=base_xp, source=base_source)
     db.add(base_tx)
     if bonus_xp > 0:
-        bonus_tx = models.XPTransaction(user_id=user.id, amount=bonus_xp, source="perfect_lesson_bonus")
+        bonus_tx = models.XPTransaction(user_id=user.id, amount=bonus_xp, source=bonus_source)
         db.add(bonus_tx)
 
     # Update progress

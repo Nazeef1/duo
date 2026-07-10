@@ -13,6 +13,12 @@ interface UserState {
   isLoading: boolean;
   error: string | null;
 
+  // Gamification & Settings Preferences
+  soundEffectsEnabled: boolean;
+  animationsEnabled: boolean;
+  motivationalMessagesEnabled: boolean;
+  theme: 'light' | 'dark' | 'system';
+
   fetchUser: () => Promise<void>;
   refillHearts: () => Promise<void>;
   setAttemptId: (id: number | null) => void;
@@ -22,9 +28,16 @@ interface UserState {
   updateDailyGoal: (goal: number) => void;
   updateUsername: (name: string) => void;
   openChest: (chestId: string) => Promise<void>;
+
+  // Toggle Preferences Actions
+  setSoundEffects: (enabled: boolean) => void;
+  setAnimations: (enabled: boolean) => void;
+  setMotivationalMessages: (enabled: boolean) => void;
+  setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  loadPreferences: () => void;
 }
 
-export const useUserStore = create<UserState>((set) => ({
+export const useUserStore = create<UserState>((set, get) => ({
   username: 'learner',
   hearts: 5,
   gems: 500,
@@ -35,6 +48,12 @@ export const useUserStore = create<UserState>((set) => ({
   currentAttemptId: null,
   isLoading: false,
   error: null,
+
+  // Default preferences
+  soundEffectsEnabled: true,
+  animationsEnabled: true,
+  motivationalMessagesEnabled: true,
+  theme: 'dark',
 
   fetchUser: async () => {
     set({ isLoading: true, error: null });
@@ -89,5 +108,54 @@ export const useUserStore = create<UserState>((set) => ({
     } catch (err: any) {
       console.error('Failed to open chest:', err.message);
     }
+  },
+
+  // Toggle Preferences
+  setSoundEffects: (enabled) => {
+    localStorage.setItem('pref_sound_effects', JSON.stringify(enabled));
+    set({ soundEffectsEnabled: enabled });
+  },
+
+  setAnimations: (enabled) => {
+    localStorage.setItem('pref_animations', JSON.stringify(enabled));
+    set({ animationsEnabled: enabled });
+  },
+
+  setMotivationalMessages: (enabled) => {
+    localStorage.setItem('pref_motivational_messages', JSON.stringify(enabled));
+    set({ motivationalMessagesEnabled: enabled });
+  },
+
+  setTheme: (theme) => {
+    localStorage.setItem('pref_theme', theme);
+    set({ theme });
+    // Apply dataset attribute to document element for immediate CSS vars mapping
+    if (typeof document !== 'undefined') {
+      let activeTheme = theme;
+      if (theme === 'system') {
+        activeTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', activeTheme === 'dark' ? 'dark' : 'light');
+    }
+  },
+
+  loadPreferences: () => {
+    if (typeof window === 'undefined') return;
+    
+    const soundVal = localStorage.getItem('pref_sound_effects');
+    const animVal = localStorage.getItem('pref_animations');
+    const motivVal = localStorage.getItem('pref_motivational_messages');
+    const themeVal = 'dark';
+    localStorage.setItem('pref_theme', 'dark');
+
+    set({
+      soundEffectsEnabled: soundVal !== null ? JSON.parse(soundVal) : true,
+      animationsEnabled: animVal !== null ? JSON.parse(animVal) : true,
+      motivationalMessagesEnabled: motivVal !== null ? JSON.parse(motivVal) : true,
+      theme: 'dark',
+    });
+
+    // Apply active theme immediately
+    get().setTheme('dark');
   }
 }));

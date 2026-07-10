@@ -39,8 +39,8 @@ export const api = {
   
   getLesson: (lessonId: number) => fetchJson<Lesson>(`/lessons/${lessonId}`),
   
-  startAttempt: (lessonId: number) => 
-    fetchJson<StartAttemptResponse>(`/lessons/${lessonId}/attempts`, { method: 'POST' }),
+  startAttempt: (lessonId: number, isLegendary: boolean = false) => 
+    fetchJson<StartAttemptResponse>(`/lessons/${lessonId}/attempts?is_legendary=${isLegendary}`, { method: 'POST' }),
   
   submitAnswer: (attemptId: number, exerciseId: number, submittedAnswer: any, isCorrect: boolean) => 
     fetchJson<AnswerSubmitResponse>(`/attempts/${attemptId}/answers`, {

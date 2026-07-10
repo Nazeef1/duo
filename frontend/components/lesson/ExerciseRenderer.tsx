@@ -12,9 +12,11 @@ interface ExerciseRendererProps {
   selectedAnswer: any;
   onChange: (val: any) => void;
   disabled: boolean;
+  isChecked?: boolean;
+  isCorrect?: boolean;
 }
 
-export default function ExerciseRenderer({ exercise, selectedAnswer, onChange, disabled }: ExerciseRendererProps) {
+export default function ExerciseRenderer({ exercise, selectedAnswer, onChange, disabled, isChecked, isCorrect }: ExerciseRendererProps) {
   switch (exercise.type) {
     case 'multiple_choice':
       return (
@@ -23,6 +25,8 @@ export default function ExerciseRenderer({ exercise, selectedAnswer, onChange, d
           selectedAnswer={selectedAnswer}
           onChange={onChange}
           disabled={disabled}
+          isChecked={isChecked}
+          isCorrect={isCorrect}
         />
       );
     case 'translate':

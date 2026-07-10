@@ -30,6 +30,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLegendary, setIsLegendary] = useState(false);
 
   // Active exercise states
   const [selectedAnswer, setSelectedAnswer] = useState<any>(null);
@@ -48,6 +49,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   // Result modals
   const [showHeartsModal, setShowHeartsModal] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showQuitModal, setShowQuitModal] = useState(false);
   const [submittingComplete, setSubmittingComplete] = useState(false);
 
   // Complete stats summary
@@ -61,8 +63,11 @@ export default function LessonPage({ params }: LessonPageProps) {
     const initLesson = async () => {
       try {
         setLoading(true);
+        const isLeg = typeof window !== 'undefined' ? window.location.search.includes('legendary=true') : false;
+        setIsLegendary(isLeg);
+
         // 1. Start lesson attempt
-        const attempt = await api.startAttempt(lessonId);
+        const attempt = await api.startAttempt(lessonId, isLeg);
         setAttemptId(attempt.attempt_id);
         reconcileHearts(attempt.hearts_remaining);
 
@@ -255,10 +260,10 @@ export default function LessonPage({ params }: LessonPageProps) {
     }
   };
 
+
+
   const handleClose = () => {
-    if (window.confirm('Are you sure you want to quit? You will lose any progress in this lesson.')) {
-      router.push('/');
-    }
+    setShowQuitModal(true);
   };
 
   const handleRefillAndRetry = async () => {
@@ -350,6 +355,8 @@ export default function LessonPage({ params }: LessonPageProps) {
           selectedAnswer={selectedAnswer}
           onChange={setSelectedAnswer}
           disabled={isAnswerChecked}
+          isChecked={isAnswerChecked}
+          isCorrect={isAnswerCorrect ?? undefined}
         />
       </main>
 
@@ -378,36 +385,73 @@ export default function LessonPage({ params }: LessonPageProps) {
               </div>
               <div>
                 <h3 className="feedback-title">
-                  {isAnswerCorrect ? 'Superb!' : 'Correct solution:'}
+                  {isAnswerCorrect ? 'Correct!' : 'Correct solution:'}
                 </h3>
                 <p className="feedback-desc">
                   {isAnswerCorrect 
-                    ? 'Excellent job!' 
+                    ? 'Great job! Keep it up!' 
                     : getCorrectAnswerText()}
                 </p>
               </div>
             </div>
             
-            <button
+             <button
               onClick={handleContinue}
-              className={`btn-3d ${isAnswerCorrect ? 'btn-green' : 'btn-red'}`}
-              style={{ minWidth: '150px' }}
+              className={`btn-3d ${isAnswerCorrect ? isLegendary ? 'btn-purple' : 'btn-green' : 'btn-red'}`}
+              style={{ 
+                minWidth: '150px',
+                ...(isLegendary && isAnswerCorrect ? { backgroundColor: 'var(--color-purple)', borderColor: 'var(--color-purple)' } : {})
+              }}
             >
               Continue
             </button>
           </>
         ) : (
           <>
-            <span style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
-              Think carefully before checking!
-            </span>
+            <button
+              onClick={() => {
+                setSelectedAnswer(currentExercise.type === 'translate' ? [] : '');
+                setIsAnswerChecked(true);
+                setIsAnswerCorrect(false);
+                sound.playIncorrect();
+                setCorrectStreak(0);
+                setFailedExercises((prev) => [...prev, currentExercise]);
+                if (attemptId) {
+                  api.submitAnswer(attemptId, currentExercise.id, null, false)
+                    .then(res => reconcileHearts(res.hearts_remaining))
+                    .catch(console.error);
+                }
+              }}
+              className="btn-3d"
+              style={{ 
+                minWidth: '120px', 
+                padding: '12px 20px',
+                backgroundColor: 'transparent',
+                color: 'var(--text-muted)',
+                borderColor: 'var(--border-color)',
+                boxShadow: 'none',
+                borderWidth: '2px'
+              }}
+            >
+              SKIP
+            </button>
             <button
               disabled={isCheckDisabled}
               onClick={checkAnswer}
-              className={`btn-3d ${isCheckDisabled ? 'btn-gray' : 'btn-green'}`}
-              style={{ minWidth: '150px' }}
+              className={`btn-3d ${isCheckDisabled ? '' : isLegendary ? 'btn-purple' : 'btn-green'}`}
+              style={{ 
+                minWidth: '150px',
+                ...(isCheckDisabled ? {
+                  backgroundColor: 'var(--bg-secondary)',
+                  color: 'var(--text-muted)',
+                  borderColor: 'var(--bg-secondary)',
+                  boxShadow: 'none',
+                  cursor: 'default'
+                } : {}),
+                ...(isLegendary && !isCheckDisabled ? { backgroundColor: 'var(--color-purple)', borderColor: 'var(--color-purple)' } : {})
+              }}
             >
-              Check
+              CHECK
             </button>
           </>
         )}
@@ -473,7 +517,11 @@ export default function LessonPage({ params }: LessonPageProps) {
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '520px' }}>
             <div style={{ marginBottom: '16px' }}>
-              <Mascot state="celebrating" size={140} />
+              <img 
+                src="/mascot/duolingo_lesson_end.gif" 
+                alt="Lesson Complete" 
+                style={{ width: '180px', height: '180px', objectFit: 'contain' }} 
+              />
             </div>
             <h2 className="modal-title">Lesson Complete!</h2>
             <p className="modal-body" style={{ marginBottom: '24px' }}>
@@ -487,7 +535,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               </div>
               <div className="complete-stat-card accuracy">
                 <span className="complete-stat-value">
-                  {completeStats.perfect ? '100%' : 'Completed'}
+                  {completeStats.perfect ? '100%' : Math.round(((exercisesQueue.length - failedExercises.length) / Math.max(exercisesQueue.length, 1)) * 100) + '%'}
                 </span>
                 <span className="complete-stat-label">Accuracy</span>
               </div>
@@ -542,6 +590,36 @@ export default function LessonPage({ params }: LessonPageProps) {
                 style={{ width: '100%' }}
               >
                 Continue to Path
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Custom Quit Confirmation Modal Popup */}
+      {showQuitModal && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '440px' }}>
+            <div style={{ marginBottom: '16px' }}>
+              <Mascot state="crying" size={120} />
+            </div>
+            <h2 className="modal-title">Wait, don't go yet!</h2>
+            <p className="modal-body" style={{ marginBottom: '24px' }}>
+              You are so close to completing this lesson! If you quit now, you'll lose all your progress in this lesson.
+            </p>
+            <div className="modal-footer" style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+              <button 
+                onClick={() => setShowQuitModal(false)}
+                className="btn-3d btn-green"
+                style={{ width: '100%' }}
+              >
+                KEEP LEARNING
+              </button>
+              <button 
+                onClick={() => router.push('/')}
+                className="btn-3d btn-gray"
+                style={{ width: '100%', color: 'var(--color-red)' }}
+              >
+                QUIT ANYWAY
               </button>
             </div>
           </div>

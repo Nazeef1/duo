@@ -49,15 +49,15 @@ export default function UnitHeader({ title, index }: UnitHeaderProps) {
 
         <button 
           onClick={() => setGuideOpen(!guideOpen)}
-          className="btn-3d btn-blue"
+          className="btn-3d"
           style={{ 
             padding: '8px 16px', 
             fontSize: '13px', 
             display: 'flex', 
             alignItems: 'center', 
             gap: '8px',
-            backgroundColor: 'transparent',
-            borderColor: 'white',
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+            borderColor: 'rgba(255, 255, 255, 0.3)',
             color: 'white'
           }}
         >

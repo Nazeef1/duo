@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useUserStore } from '@/store/useUserStore';
-import { Flame, Gem, Heart, PlusCircle } from 'lucide-react';
+import { Heart, PlusCircle } from 'lucide-react';
 
 export default function TopBar() {
-  const { streak, gems, hearts, fetchUser, refillHearts, isLoading } = useUserStore();
+  const { streak, gems, hearts, xp, fetchUser, refillHearts } = useUserStore();
   const [refilling, setRefilling] = useState(false);
 
   useEffect(() => {
@@ -20,38 +20,43 @@ export default function TopBar() {
   };
 
   return (
-    <div className="topbar">
-      <div className="stat-item streak" title="Streak count">
-        <Flame size={22} fill="currentColor" stroke="none" />
-        <span>{streak}</span>
-      </div>
-      
-      <div className="stat-item gems" title="Gems">
-        <Gem size={22} fill="currentColor" stroke="none" />
-        <span>{gems}</span>
-      </div>
-      
-      <div className="stat-item hearts" title="Hearts (Click + to refill)">
-        <Heart size={22} fill="currentColor" stroke="none" />
-        <span>{hearts}</span>
-        {hearts < 5 && (
-          <button 
-            onClick={handleRefill} 
-            disabled={refilling}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              cursor: 'pointer', 
-              color: 'var(--color-green)',
-              display: 'flex',
-              alignItems: 'center',
-              marginLeft: '2px'
-            }}
-            title="Refill Hearts"
-          >
-            <PlusCircle size={18} fill="none" stroke="currentColor" />
-          </button>
-        )}
+    <div className="topbar" style={{ borderBottom: 'none' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginLeft: 'auto' }}>
+        {/* Target Language Flag */}
+        <div className="stat-item language" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-dark)', fontWeight: 'bold' }}>
+          <img 
+            src="/icons/spain.png" 
+            alt="Spanish" 
+            style={{ width: '28px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
+          />
+          <span style={{ fontSize: '15px' }}>15</span>
+        </div>
+
+        {/* Streak */}
+        <div className="stat-item streak" title="Day Streak" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-orange)' }}>
+          <img 
+            src="/icons/fire.png" 
+            alt="Streak" 
+            style={{ width: '24px', height: '24px', objectFit: 'contain' }} 
+          />
+          <span style={{ fontSize: '15px' }}>{streak}</span>
+        </div>
+        
+        {/* Gems */}
+        <div className="stat-item gems" title="Gems" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-blue)' }}>
+          <img 
+            src="/icons/gem.png" 
+            alt="Gems" 
+            style={{ width: '24px', height: '24px', objectFit: 'contain' }} 
+          />
+          <span style={{ fontSize: '15px' }}>{gems}</span>
+        </div>
+        
+        {/* Hearts */}
+        <div className="stat-item hearts" title="Hearts" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-red)' }}>
+          <Heart size={24} fill="var(--color-red)" stroke="none" />
+          <span style={{ fontSize: '15px' }}>{hearts}</span>
+        </div>
       </div>
     </div>
   );

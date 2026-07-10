@@ -101,6 +101,7 @@ class LessonAttempt(Base):
     completed_at = Column(DateTime, nullable=True)
     hearts_lost = Column(Integer, default=0)
     status = Column(String)  # 'in_progress' | 'completed' | 'failed'
+    is_legendary = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="attempts")
     lesson = relationship("Lesson", back_populates="attempts")
