@@ -21,6 +21,10 @@ export default function ShopPage() {
       alert('Your hearts are already full!');
       return;
     }
+    if (gems < 350) {
+      alert('You need 350 gems to buy a heart refill!');
+      return;
+    }
     
     setLoading(true);
     try {
@@ -106,7 +110,12 @@ export default function ShopPage() {
                 cursor: hearts >= 5 ? 'default' : 'pointer'
               }}
             >
-              {hearts >= 5 ? 'FULL' : 'BUY'}
+              {hearts >= 5 ? 'FULL' : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+                  <img src="/icons/gem.png" alt="Gem" style={{ width: '18px', height: '18px', objectFit: 'contain' }} />
+                  <span>350</span>
+                </div>
+              )}
             </button>
           </div>
         </div>

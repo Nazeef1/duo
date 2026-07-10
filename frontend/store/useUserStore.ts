@@ -77,9 +77,10 @@ export const useUserStore = create<UserState>((set, get) => ({
   refillHearts: async () => {
     try {
       const response = await api.refillHearts();
-      set({ hearts: response.hearts });
+      set({ hearts: response.hearts, gems: response.gems });
     } catch (err: any) {
       set({ error: err.message || 'Failed to refill hearts' });
+      throw err;
     }
   },
 

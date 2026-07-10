@@ -76,11 +76,18 @@ def refill_hearts(db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
+    if user.hearts >= 5:
+        raise HTTPException(status_code=400, detail="Hearts are already full!")
+
+    if user.gems < 350:
+        raise HTTPException(status_code=400, detail="Insufficient gems! You need 350 gems to refill hearts.")
+
+    user.gems -= 350
     user.hearts = 5
     user.hearts_last_lost_at = None
     db.commit()
     
-    return {"hearts": 5}
+    return {"hearts": 5, "gems": user.gems}
 
 @router.post("/chests/open", response_model=schemas.ChestOpenResponse)
 def open_chest(payload: schemas.ChestOpenRequest, db: Session = Depends(get_db)):

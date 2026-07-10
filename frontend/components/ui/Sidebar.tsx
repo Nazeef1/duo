@@ -30,16 +30,12 @@ export default function Sidebar() {
 
   return (
     <div className="sidebar">
-      <Link href="/" className="sidebar-logo" style={{ 
-        paddingLeft: '16px', 
-        marginBottom: '32px',
-        fontSize: '32px',
-        fontWeight: 900,
-        color: 'var(--color-green)',
-        textDecoration: 'none',
-        letterSpacing: '-1px'
-      }}>
-        duolingo
+      <Link href="/" className="sidebar-logo" style={{ display: 'flex', justifyContent: 'center', paddingLeft: '0px', marginBottom: '32px', width: '100%' }}>
+        <img 
+          src="/mascot/duojump.png?v=5" 
+          alt="duolingo" 
+          style={{ height: '48px', width: 'auto', objectFit: 'contain' }} 
+        />
       </Link>
       
       <ul className="sidebar-menu">

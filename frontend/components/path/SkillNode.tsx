@@ -60,13 +60,7 @@ export default function SkillNode({
       if (isLocked) return;
       const isAlreadyOpened = openedChests.includes(chestId);
       if (isAlreadyOpened) return;
-
-      // Play level complete fanfare
-      sound.playComplete();
-      
-      // Call openChest API and update Zustand state
-      await openChest(chestId);
-      setShowRewardModal(true);
+      setActivePopoverIndex(popoverOpen ? null : index);
     }
   };
 
@@ -115,6 +109,25 @@ export default function SkillNode({
           {isOpen ? 'Claimed' : 'Bonus Chest'}
         </div>
 
+        {popoverOpen && !isOpen && !isLocked && (
+          <div className="skill-popover">
+            <h4 className="skill-popover-title">Bonus Chest</h4>
+            <p className="skill-popover-subtitle">Claim your path bonus reward!</p>
+            <button
+              onClick={async () => {
+                setActivePopoverIndex(null);
+                sound.playComplete();
+                await openChest(chestId);
+                setShowRewardModal(true);
+              }}
+              className="btn-3d btn-green"
+              style={{ width: '100%', padding: '10px 20px', fontSize: '14px' }}
+            >
+              Claim +20 Gems
+            </button>
+          </div>
+        )}
+
         {/* Chest reward popup modal - Rendered outside transformed hierarchy */}
         {showRewardModal && typeof document !== 'undefined' && createPortal(
           <div className="modal-overlay">
@@ -148,25 +161,50 @@ export default function SkillNode({
       <div 
         className="skill-node-wrapper"
       >
-        <div 
-          className="skill-node-inner"
-          style={{
-            backgroundColor: isLocked ? '#37464f' : 'var(--color-gold)',
-            borderColor: isLocked ? '#202f36' : 'var(--color-gold-dark)',
-            boxShadow: isLocked ? '0 6px 0 #202f36' : '0 6px 0 var(--color-gold-dark)',
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+        <button
+          onClick={() => {
+            if (!isLocked) {
+              setActivePopoverIndex(popoverOpen ? null : index);
+            }
           }}
+          className="skill-node-circle"
+          style={{ cursor: isLocked ? 'default' : 'pointer', border: 'none', background: 'none' }}
         >
-          <Trophy size={32} fill={isLocked ? 'none' : 'currentColor'} style={{ color: isLocked ? 'var(--text-muted)' : 'var(--bg-primary)' }} />
-        </div>
+          <div 
+            className="skill-node-inner"
+            style={{
+              backgroundColor: isLocked ? '#37464f' : 'var(--color-gold)',
+              borderColor: isLocked ? '#202f36' : 'var(--color-gold-dark)',
+              boxShadow: isLocked ? '0 6px 0 #202f36' : '0 6px 0 var(--color-gold-dark)',
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Trophy size={32} fill={isLocked ? 'none' : 'currentColor'} style={{ color: isLocked ? 'var(--text-muted)' : 'var(--bg-primary)' }} />
+          </div>
+        </button>
         <div className="skill-node-title" style={{ color: isLocked ? 'var(--text-muted)' : 'var(--text-dark)', fontSize: '14px', fontWeight: '900' }}>
           Unit Review
         </div>
+
+        {popoverOpen && !isLocked && (
+          <div className="skill-popover">
+            <h4 className="skill-popover-title">Unit Review</h4>
+            <p className="skill-popover-subtitle">Practice unit exercises and test your skills!</p>
+            <Link 
+              href="/lesson/1"
+              className="btn-3d btn-green"
+              style={{ padding: '10px 20px', fontSize: '14px', width: '100%' }}
+              onClick={() => setActivePopoverIndex(null)}
+            >
+              Start Review (+20 XP)
+            </Link>
+          </div>
+        )}
       </div>
     );
   }

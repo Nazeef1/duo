@@ -124,6 +124,7 @@ class LeaderboardEntry(BaseModel):
 
 class RefillHeartsResponse(BaseModel):
     hearts: int
+    gems: int
 
 class ChestOpenRequest(BaseModel):
     chest_id: str

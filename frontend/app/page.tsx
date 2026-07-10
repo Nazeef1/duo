@@ -17,6 +17,19 @@ export default function LearnPage() {
   
   // Hoisted popover state: only one node popover can be open at a time
   const [activePopoverIndex, setActivePopoverIndex] = useState<number | null>(null);
+  const [lilyBubbleOpen, setLilyBubbleOpen] = useState(false);
+  const [duoBubbleOpen, setDuoBubbleOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.skill-node-wrapper') && !target.closest('.skill-popover')) {
+        setActivePopoverIndex(null);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, []);
 
   const { xp, dailyGoal, fetchUser, streak, gems, hearts, refillHearts, username } = useUserStore();
   const [refilling, setRefilling] = useState(false);
@@ -101,54 +114,132 @@ export default function LearnPage() {
                     const currentIdx = flatIndex;
                     flatIndex += 1;
 
-                    // Zig-zag pattern logic
-                    const pattern = [0, -40, -80, -40, 0, 40, 80, 40];
+                    // Zig-zag pattern logic - Widen swings to 120px for a more pronounced curve
+                    const pattern = [0, -60, -120, -60, 0, 60, 120, 60];
                     const offset = pattern[currentIdx % pattern.length];
 
                     // Render primary Skill Node
                     nodesToRender.push(
                       <div key={`skill-wrapper-${skill.id}`} style={{ position: 'relative', transform: `translateX(${offset}px)` }}>
-                        {/* 1. Animated mascot Lily clapping GIF next to Unit 1, Skill 1 (left side) */}
+                        {/* 1. Animated mascot Lily clapping GIF next to Unit 1, Skill 1 (right side empty space) */}
                         {unitIdx === 0 && skillIdx === 0 && (
                           <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLilyBubbleOpen(!lilyBubbleOpen);
+                              setDuoBubbleOpen(false);
+                            }}
                             style={{ 
                               position: 'absolute', 
-                              left: '-140px', 
-                              top: '0px', 
-                              zIndex: 5, 
-                              width: '100px', 
-                              height: '100px', 
-                              pointerEvents: 'none',
-                              textAlign: 'center'
+                              right: '-180px', 
+                              top: '-20px', 
+                              zIndex: 15, 
+                              width: '150px', 
+                              height: '150px', 
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer'
                             }}
                           >
                             <img 
                               src="/mascot/claplyn.gif" 
                               alt="Lily Clapping" 
-                              style={{ width: '80px', height: '80px', objectFit: 'contain' }} 
+                              style={{ width: '130px', height: '130px', objectFit: 'contain' }} 
                             />
+                            {lilyBubbleOpen && (
+                              <div style={{
+                                position: 'absolute',
+                                bottom: '130px',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                backgroundColor: 'var(--bg-secondary)',
+                                border: '2px solid var(--border-color)',
+                                borderBottom: '4px solid var(--border-color)',
+                                borderRadius: '12px',
+                                padding: '8px 12px',
+                                width: '160px',
+                                fontSize: '13px',
+                                fontWeight: 800,
+                                zIndex: 100,
+                                color: 'var(--text-dark)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                              }}>
+                                Ugh, a lesson. If you must... 🙄
+                                <div style={{
+                                  position: 'absolute',
+                                  bottom: '-8px',
+                                  left: '50%',
+                                  transform: 'translateX(-50%) rotate(45deg)',
+                                  width: '10px',
+                                  height: '10px',
+                                  backgroundColor: 'var(--bg-secondary)',
+                                  borderRight: '2px solid var(--border-color)',
+                                  borderBottom: '2px solid var(--border-color)'
+                                }} />
+                              </div>
+                            )}
                           </div>
                         )}
 
-                        {/* 2. Animated Flexing Duo GIF next to Unit 2, Skill 1 (left side) */}
+                        {/* 2. Animated Flexing Duo GIF next to Unit 2, Skill 1 (left side empty space) */}
                         {unitIdx === 1 && skillIdx === 0 && (
                           <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDuoBubbleOpen(!duoBubbleOpen);
+                              setLilyBubbleOpen(false);
+                            }}
                             style={{ 
                               position: 'absolute', 
-                              left: '-140px', 
-                              top: '0px', 
-                              zIndex: 5, 
-                              width: '100px', 
-                              height: '100px', 
-                              pointerEvents: 'none',
-                              textAlign: 'center'
+                              left: '-180px', 
+                              top: '-20px', 
+                              zIndex: 15, 
+                              width: '150px', 
+                              height: '150px', 
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer'
                             }}
                           >
                             <img 
                               src="/mascot/duostrong.gif" 
                               alt="Strong Duo" 
-                              style={{ width: '80px', height: '80px', objectFit: 'contain' }} 
+                              style={{ width: '130px', height: '130px', objectFit: 'contain' }} 
                             />
+                            {duoBubbleOpen && (
+                              <div style={{
+                                position: 'absolute',
+                                bottom: '130px',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                backgroundColor: 'var(--bg-secondary)',
+                                border: '2px solid var(--border-color)',
+                                borderBottom: '4px solid var(--border-color)',
+                                borderRadius: '12px',
+                                padding: '8px 12px',
+                                width: '160px',
+                                fontSize: '13px',
+                                fontWeight: 800,
+                                zIndex: 100,
+                                color: 'var(--text-dark)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                              }}>
+                                You're doing great! Keep it up! 🦉💪
+                                <div style={{
+                                  position: 'absolute',
+                                  bottom: '-8px',
+                                  left: '50%',
+                                  transform: 'translateX(-50%) rotate(45deg)',
+                                  width: '10px',
+                                  height: '10px',
+                                  backgroundColor: 'var(--bg-secondary)',
+                                  borderRight: '2px solid var(--border-color)',
+                                  borderBottom: '2px solid var(--border-color)'
+                                }} />
+                              </div>
+                            )}
                           </div>
                         )}
 
@@ -166,30 +257,36 @@ export default function LearnPage() {
                     if (unitIdx === 0 && skillIdx === 1) {
                       const chestIdx = flatIndex;
                       flatIndex += 1;
+                      const chestOffset = pattern[chestIdx % pattern.length];
                       nodesToRender.push(
-                        <SkillNode
-                          key={`chest-unit1`}
-                          index={chestIdx}
-                          type="chest"
-                          chestId="chest_unit1"
-                          isLocked={skill.status !== 'completed'}
-                          activePopoverIndex={activePopoverIndex}
-                          setActivePopoverIndex={setActivePopoverIndex}
-                        />
+                        <div key={`chest-wrapper-1`} style={{ position: 'relative', transform: `translateX(${chestOffset}px)` }}>
+                          <SkillNode
+                            key={`chest-unit1`}
+                            index={chestIdx}
+                            type="chest"
+                            chestId="chest_unit1"
+                            isLocked={skill.status !== 'completed'}
+                            activePopoverIndex={activePopoverIndex}
+                            setActivePopoverIndex={setActivePopoverIndex}
+                          />
+                        </div>
                       );
                     } else if (unitIdx === 1 && skillIdx === 0) {
                       const chestIdx = flatIndex;
                       flatIndex += 1;
+                      const chestOffset = pattern[chestIdx % pattern.length];
                       nodesToRender.push(
-                        <SkillNode
-                          key={`chest-unit2`}
-                          index={chestIdx}
-                          type="chest"
-                          chestId="chest_unit2"
-                          isLocked={skill.status !== 'completed'}
-                          activePopoverIndex={activePopoverIndex}
-                          setActivePopoverIndex={setActivePopoverIndex}
-                        />
+                        <div key={`chest-wrapper-2`} style={{ position: 'relative', transform: `translateX(${chestOffset}px)` }}>
+                          <SkillNode
+                            key={`chest-unit2`}
+                            index={chestIdx}
+                            type="chest"
+                            chestId="chest_unit2"
+                            isLocked={skill.status !== 'completed'}
+                            activePopoverIndex={activePopoverIndex}
+                            setActivePopoverIndex={setActivePopoverIndex}
+                          />
+                        </div>
                       );
                     }
 
@@ -197,15 +294,18 @@ export default function LearnPage() {
                     if (skillIdx === unit.skills.length - 1) {
                       const trophyIdx = flatIndex;
                       flatIndex += 1;
+                      const trophyOffset = pattern[trophyIdx % pattern.length];
                       nodesToRender.push(
-                        <SkillNode
-                          key={`trophy-unit-${unit.id}`}
-                          index={trophyIdx}
-                          type="trophy"
-                          isLocked={skill.status !== 'completed'}
-                          activePopoverIndex={activePopoverIndex}
-                          setActivePopoverIndex={setActivePopoverIndex}
-                        />
+                        <div key={`trophy-wrapper-unit-${unit.id}`} style={{ position: 'relative', transform: `translateX(${trophyOffset}px)` }}>
+                          <SkillNode
+                            key={`trophy-unit-${unit.id}`}
+                            index={trophyIdx}
+                            type="trophy"
+                            isLocked={skill.status !== 'completed'}
+                            activePopoverIndex={activePopoverIndex}
+                            setActivePopoverIndex={setActivePopoverIndex}
+                          />
+                        </div>
                       );
                     }
 

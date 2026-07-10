@@ -281,19 +281,209 @@ export default function LessonPage({ params }: LessonPageProps) {
     return data.answer;
   };
 
+  if (showCompleteModal && completeStats) {
+    const accuracy = completeStats.perfect ? 100 : Math.round(((exercisesQueue.length - failedExercises.length) / Math.max(exercisesQueue.length, 1)) * 100);
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#ffffff',
+        color: '#3c3c3c',
+        fontFamily: 'var(--font-nunito)',
+        padding: '24px'
+      }}>
+        {/* Main Content Area */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '24px',
+          flex: 1,
+          justifyContent: 'center',
+          maxWidth: '600px',
+          width: '100%'
+        }}>
+          {/* Mascot Animation */}
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <img 
+              src="/mascot/nice_job.gif" 
+              alt="Nice Job!" 
+              style={{ width: '240px', height: '180px', objectFit: 'contain' }} 
+            />
+          </div>
+
+          {/* Heading */}
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{
+              color: '#ffc800',
+              fontSize: '36px',
+              fontWeight: 900,
+              textTransform: 'none',
+              marginBottom: '8px'
+            }}>
+              {completeStats.perfect ? 'Perfect lesson!' : 'Lesson complete!'}
+            </h1>
+            <p style={{
+              color: '#afafaf',
+              fontSize: '18px',
+              fontWeight: 700
+            }}>
+              {completeStats.perfect ? 'You made no mistakes in this lesson' : 'You did an amazing job!'}
+            </p>
+          </div>
+
+          {/* Stats Cards */}
+          <div style={{
+            display: 'flex',
+            gap: '24px',
+            width: '100%',
+            justifyContent: 'center',
+            marginTop: '12px'
+          }}>
+            {/* XP Card */}
+            <div style={{
+              width: '160px',
+              borderRadius: '20px',
+              border: '2px solid #ffc800',
+              overflow: 'hidden',
+              boxShadow: '0 4px 0 #ffc800'
+            }}>
+              <div style={{
+                backgroundColor: '#ffc800',
+                color: '#ffffff',
+                textAlign: 'center',
+                padding: '6px 12px',
+                fontSize: '12px',
+                fontWeight: 900,
+                textTransform: 'uppercase',
+                letterSpacing: '0.8px'
+              }}>
+                TOTAL XP
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+                padding: '20px 12px',
+                backgroundColor: '#ffffff'
+              }}>
+                <img src="/icons/lightning.png" alt="XP" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+                <span style={{ fontSize: '28px', fontWeight: 900, color: '#ffc800' }}>
+                  {completeStats.xp_earned}
+                </span>
+              </div>
+            </div>
+
+            {/* Accuracy Card */}
+            <div style={{
+              width: '160px',
+              borderRadius: '20px',
+              border: '2px solid #58cc02',
+              overflow: 'hidden',
+              boxShadow: '0 4px 0 #58cc02'
+            }}>
+              <div style={{
+                backgroundColor: '#58cc02',
+                color: '#ffffff',
+                textAlign: 'center',
+                padding: '6px 12px',
+                fontSize: '12px',
+                fontWeight: 900,
+                textTransform: 'uppercase',
+                letterSpacing: '0.8px'
+              }}>
+                {completeStats.perfect ? 'AMAZING' : 'ACCURACY'}
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+                padding: '20px 12px',
+                backgroundColor: '#ffffff'
+              }}>
+                <img src="/icons/target.png" alt="Accuracy" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+                <span style={{ fontSize: '28px', fontWeight: 900, color: '#58cc02' }}>
+                  {accuracy}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Action Bar */}
+        <div style={{
+          width: '100%',
+          maxWidth: '600px',
+          borderTop: '2px solid #e5e5e5',
+          paddingTop: '20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '20px'
+        }}>
+          <button
+            onClick={() => {
+              router.push('/');
+            }}
+            className="btn-3d btn-gray"
+            style={{
+              backgroundColor: '#ffffff',
+              color: '#afafaf',
+              borderColor: '#e5e5e5',
+              boxShadow: '0 4px 0 #e5e5e5',
+              flex: 1,
+              padding: '16px',
+              fontSize: '16px',
+              borderRadius: '16px'
+            }}
+          >
+            Review Lesson
+          </button>
+          
+          <button
+            onClick={() => router.push('/')}
+            className="btn-3d btn-green"
+            style={{
+              backgroundColor: '#58cc02',
+              borderColor: '#58cc02',
+              boxShadow: '0 4px 0 #46a302',
+              flex: 1,
+              padding: '16px',
+              fontSize: '16px',
+              borderRadius: '16px'
+            }}
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+    );
+  }
   const isCheckDisabled = selectedAnswer === null || 
     (Array.isArray(selectedAnswer) && selectedAnswer.length === 0) ||
     (typeof selectedAnswer === 'string' && selectedAnswer.trim() === '');
 
   return (
     <div className="lesson-player-container">
-      <header className="lesson-header">
+      <header className="lesson-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 'auto', padding: '16px 40px', gap: '24px' }}>
         <button onClick={handleClose} className="lesson-close-btn" title="Quit Lesson">
           <X size={28} />
         </button>
         
-        <div className="progress-bar-container">
-          <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+          {correctStreak >= 2 && (
+            <span style={{ color: 'var(--color-orange)', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+              {correctStreak} IN A ROW
+            </span>
+          )}
+          <div className="progress-bar-container" style={{ width: '100%' }}>
+            <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }} />
+          </div>
         </div>
         
         <div className="lesson-hearts" title="Hearts remaining">
