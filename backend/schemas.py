@@ -104,6 +104,7 @@ class ProfileResponse(BaseModel):
     skills_completed: int
     joined_at: datetime
     daily_xp_goal: int
+    opened_chests: List[str]
 
     class Config:
         from_attributes = True
@@ -123,3 +124,12 @@ class LeaderboardEntry(BaseModel):
 
 class RefillHeartsResponse(BaseModel):
     hearts: int
+
+class ChestOpenRequest(BaseModel):
+    chest_id: str
+
+class ChestOpenResponse(BaseModel):
+    chest_id: str
+    gems_earned: int
+    total_gems: int
+

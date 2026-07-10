@@ -8,6 +8,7 @@ interface UserState {
   xp: number;
   streak: number;
   dailyGoal: number;
+  openedChests: string[];
   currentAttemptId: number | null;
   isLoading: boolean;
   error: string | null;
@@ -20,6 +21,7 @@ interface UserState {
   updateLocalStats: (updates: { xp_earned?: number; streak?: number }) => void;
   updateDailyGoal: (goal: number) => void;
   updateUsername: (name: string) => void;
+  openChest: (chestId: string) => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -29,6 +31,7 @@ export const useUserStore = create<UserState>((set) => ({
   xp: 0,
   streak: 0,
   dailyGoal: 30,
+  openedChests: [],
   currentAttemptId: null,
   isLoading: false,
   error: null,
@@ -44,6 +47,7 @@ export const useUserStore = create<UserState>((set) => ({
         xp: profile.total_xp,
         streak: profile.streak,
         dailyGoal: profile.daily_xp_goal,
+        openedChests: profile.opened_chests || [],
         isLoading: false,
       });
     } catch (err: any) {
@@ -73,5 +77,17 @@ export const useUserStore = create<UserState>((set) => ({
 
   updateDailyGoal: (goal) => set({ dailyGoal: goal }),
 
-  updateUsername: (name) => set({ username: name })
+  updateUsername: (name) => set({ username: name }),
+
+  openChest: async (chestId) => {
+    try {
+      const res = await api.openChest(chestId);
+      set((state) => ({
+        gems: res.total_gems,
+        openedChests: [...state.openedChests, chestId]
+      }));
+    } catch (err: any) {
+      console.error('Failed to open chest:', err.message);
+    }
+  }
 }));

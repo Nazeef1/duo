@@ -79,6 +79,7 @@ export interface ProfileResponse {
   skills_completed: number;
   joined_at: string;
   daily_xp_goal: number;
+  opened_chests: string[];
 }
 
 export interface LeaderboardEntry {

@@ -62,4 +62,9 @@ export const api = {
   getLeaderboard: () => fetchJson<LeaderboardEntry[]>('/leaderboard'),
   
   refillHearts: () => fetchJson<{ hearts: number }>('/hearts/refill', { method: 'POST' }),
+  
+  openChest: (chestId: string) => fetchJson<{ chest_id: string; gems_earned: number; total_gems: number }>('/chests/open', {
+    method: 'POST',
+    body: JSON.stringify({ chest_id: chestId })
+  }),
 };

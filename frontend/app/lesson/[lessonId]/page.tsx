@@ -6,7 +6,10 @@ import { api } from '@/lib/api';
 import { Lesson, Exercise } from '@/lib/types';
 import { useUserStore } from '@/store/useUserStore';
 import ExerciseRenderer from '@/components/lesson/ExerciseRenderer';
-import { X, Heart, CheckCircle2, AlertCircle, Award, Zap, RefreshCw } from 'lucide-react';
+import Mascot from '@/components/ui/Mascot';
+import { sound } from '@/lib/sound';
+import { speech } from '@/lib/speech';
+import { X, Heart, CheckCircle2, AlertCircle, Award, Volume2, Sparkles, Smile } from 'lucide-react';
 
 interface LessonPageProps {
   params: Promise<{ lessonId: string }>;
@@ -15,7 +18,7 @@ interface LessonPageProps {
 export default function LessonPage({ params }: LessonPageProps) {
   const router = useRouter();
   
-  // Resolve params using React.use() per Next.js 15 guidelines
+  // Resolve params using React.use()
   const resolvedParams = use(params);
   const lessonId = parseInt(resolvedParams.lessonId);
 
@@ -23,6 +26,7 @@ export default function LessonPage({ params }: LessonPageProps) {
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [attemptId, setAttemptId] = useState<number | null>(null);
+  const [exercisesQueue, setExercisesQueue] = useState<Exercise[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +36,15 @@ export default function LessonPage({ params }: LessonPageProps) {
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
   
+  // Mistake Review & Redo States
+  const [failedExercises, setFailedExercises] = useState<Exercise[]>([]);
+  const [isReviewMode, setIsReviewMode] = useState(false);
+  const [showReviewSplash, setShowReviewSplash] = useState(false);
+
+  // Gamification & Streak States
+  const [correctStreak, setCorrectStreak] = useState(0);
+  const [mascotBubble, setMascotBubble] = useState<string | null>(null);
+
   // Result modals
   const [showHeartsModal, setShowHeartsModal] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
@@ -56,6 +69,7 @@ export default function LessonPage({ params }: LessonPageProps) {
         // 2. Fetch exercises
         const data = await api.getLesson(lessonId);
         setLesson(data);
+        setExercisesQueue(data.exercises);
         
         if (attempt.hearts_remaining <= 0) {
           setShowHeartsModal(true);
@@ -70,18 +84,51 @@ export default function LessonPage({ params }: LessonPageProps) {
     initLesson();
   }, [lessonId, reconcileHearts]);
 
-  // If loading or error
+  // Handle speaker click for Spanish Text-to-Speech
+  const handleSpeak = () => {
+    if (!currentExercise) return;
+    const data = currentExercise.data;
+    let textToSpeak = '';
+
+    if (currentExercise.type === 'translate') {
+      textToSpeak = Array.isArray(data.answer) ? data.answer.join(' ') : data.answer;
+    } else if (currentExercise.type === 'fill_blank') {
+      textToSpeak = data.prompt.replace('___', data.answer);
+    } else if (currentExercise.type === 'type_answer') {
+      textToSpeak = data.answer;
+    } else if (currentExercise.type === 'multiple_choice') {
+      textToSpeak = data.answer;
+    } else {
+      textToSpeak = currentExercise.data.prompt;
+    }
+
+    if (textToSpeak) {
+      speech.speak(textToSpeak);
+    }
+  };
+
+  // Trigger speak automatically on load of a new question
+  useEffect(() => {
+    if (exercisesQueue.length > 0 && currentIdx < exercisesQueue.length) {
+      // Small timeout to allow browser layout to complete
+      const timer = setTimeout(() => {
+        handleSpeak();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [currentIdx, exercisesQueue]);
+
   if (loading) {
     return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '18px' }}>
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '18px', backgroundColor: 'var(--bg-primary)', color: 'var(--text-dark)' }}>
         Preparing your lesson...
       </div>
     );
   }
 
-  if (error || !lesson || lesson.exercises.length === 0) {
+  if (error || !lesson || exercisesQueue.length === 0) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', alignItems: 'center', justifyContent: 'center', gap: '16px', backgroundColor: 'var(--bg-primary)', color: 'var(--text-dark)' }}>
         <div style={{ color: 'var(--color-red)', fontWeight: 800, fontSize: '18px' }}>
           {error || 'No exercises found in this lesson.'}
         </div>
@@ -92,8 +139,8 @@ export default function LessonPage({ params }: LessonPageProps) {
     );
   }
 
-  const currentExercise = lesson.exercises[currentIdx];
-  const progressPercent = Math.round((currentIdx / lesson.exercises.length) * 100);
+  const currentExercise = exercisesQueue[currentIdx];
+  const progressPercent = Math.round((currentIdx / exercisesQueue.length) * 100);
 
   // Check correctness of answer client-side
   const checkAnswer = async () => {
@@ -122,6 +169,31 @@ export default function LessonPage({ params }: LessonPageProps) {
     setIsAnswerCorrect(isCorrect);
     setIsAnswerChecked(true);
 
+    // Play chimes based on correctness
+    if (isCorrect) {
+      sound.playCorrect();
+      const nextStreak = correctStreak + 1;
+      setCorrectStreak(nextStreak);
+
+      // Trigger streak messages from Duo the Owl
+      if (nextStreak === 2) {
+        setMascotBubble('Great job! 2 in a row!');
+        setTimeout(() => setMascotBubble(null), 3000);
+      } else if (nextStreak === 5) {
+        setMascotBubble('Unstoppable! 5 in a row!');
+        setTimeout(() => setMascotBubble(null), 3000);
+      } else if (nextStreak === 8) {
+        setMascotBubble("You're a legend! 8 in a row!");
+        setTimeout(() => setMascotBubble(null), 3000);
+      }
+    } else {
+      sound.playIncorrect();
+      setCorrectStreak(0);
+      
+      // Add current exercise to failed list for mistakes review redo
+      setFailedExercises((prev) => [...prev, currentExercise]);
+    }
+
     try {
       const res = await api.submitAnswer(attemptId, currentExercise.id, selectedAnswer, isCorrect);
       reconcileHearts(res.hearts_remaining);
@@ -142,27 +214,43 @@ export default function LessonPage({ params }: LessonPageProps) {
       return;
     }
 
-    if (currentIdx < lesson.exercises.length - 1) {
+    if (currentIdx < exercisesQueue.length - 1) {
+      // Move to next exercise in current queue
       setSelectedAnswer(null);
       setIsAnswerChecked(false);
       setIsAnswerCorrect(null);
       setCurrentIdx(currentIdx + 1);
     } else {
-      setSubmittingComplete(true);
-      try {
-        const res = await api.completeAttempt(attemptId);
-        setCompleteStats({
-          xp_earned: res.xp_earned,
-          perfect: res.perfect,
-          achievements: res.achievements_unlocked
-        });
-        
-        updateLocalStats({ xp_earned: res.xp_earned, streak: res.streak });
-        setShowCompleteModal(true);
-      } catch (err) {
-        console.error('Error completing lesson', err);
-      } finally {
-        setSubmittingComplete(false);
+      // End of active queue. Check if we have failed questions to review
+      if (failedExercises.length > 0) {
+        // Prepare mistakes review mode
+        setExercisesQueue(failedExercises);
+        setFailedExercises([]);
+        setCurrentIdx(0);
+        setSelectedAnswer(null);
+        setIsAnswerChecked(false);
+        setIsAnswerCorrect(null);
+        setIsReviewMode(true);
+        setShowReviewSplash(true);
+      } else {
+        // No mistakes remaining, complete the lesson!
+        setSubmittingComplete(true);
+        sound.playComplete();
+        try {
+          const res = await api.completeAttempt(attemptId);
+          setCompleteStats({
+            xp_earned: res.xp_earned,
+            perfect: res.perfect,
+            achievements: res.achievements_unlocked
+          });
+          
+          updateLocalStats({ xp_earned: res.xp_earned, streak: res.streak });
+          setShowCompleteModal(true);
+        } catch (err) {
+          console.error('Error completing lesson', err);
+        } finally {
+          setSubmittingComplete(false);
+        }
       }
     }
   };
@@ -209,7 +297,54 @@ export default function LessonPage({ params }: LessonPageProps) {
         </div>
       </header>
 
+      {/* Slide-in Mascot Encouragement Bubble */}
+      {mascotBubble && (
+        <div className="mascot-motivation-banner">
+          <Mascot state="smiling" size={90} />
+          <div className="mascot-bubble">
+            {mascotBubble}
+          </div>
+        </div>
+      )}
+
+      {/* Main Exercise Area */}
       <main className="lesson-content">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+          {isReviewMode && (
+            <span style={{ 
+              backgroundColor: 'var(--color-orange-light)', 
+              color: 'var(--color-orange)', 
+              padding: '4px 10px', 
+              borderRadius: '8px', 
+              fontSize: '12px', 
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              Mistakes Review
+            </span>
+          )}
+          {/* TTS Speaker Icon Button */}
+          {currentExercise.type !== 'match_pairs' && (
+            <button 
+              onClick={handleSpeak}
+              className="btn-3d btn-blue"
+              style={{
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                padding: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              title="Speak phrase"
+            >
+              <Volume2 size={20} />
+            </button>
+          )}
+        </div>
+
         <ExerciseRenderer
           exercise={currentExercise}
           selectedAnswer={selectedAnswer}
@@ -218,6 +353,7 @@ export default function LessonPage({ params }: LessonPageProps) {
         />
       </main>
 
+      {/* Check/Continue Bottom Control Bar */}
       <div 
         className={`feedback-bar ${
           isAnswerChecked 
@@ -227,7 +363,7 @@ export default function LessonPage({ params }: LessonPageProps) {
             : ''
         }`}
         style={{
-          boxShadow: '0 -4px 12px rgba(0,0,0,0.05)'
+          boxShadow: '0 -4px 12px rgba(0,0,0,0.2)'
         }}
       >
         {isAnswerChecked ? (
@@ -277,11 +413,36 @@ export default function LessonPage({ params }: LessonPageProps) {
         )}
       </div>
 
+      {/* Mistakes Review Splash Screen */}
+      {showReviewSplash && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '440px' }}>
+            <div style={{ marginBottom: '16px' }}>
+              <Mascot state="determined" size={120} />
+            </div>
+            <h2 className="modal-title">Review Mistakes</h2>
+            <p className="modal-body">
+              Let's redo the questions you missed. You can do this!
+            </p>
+            <div className="modal-footer">
+              <button 
+                onClick={() => setShowReviewSplash(false)}
+                className="btn-3d btn-green"
+                style={{ width: '100%' }}
+              >
+                Start Review
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Out of Hearts Modal Popup */}
       {showHeartsModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <div style={{ color: 'var(--color-red)', marginBottom: '16px' }}>
-              <Heart size={64} fill="currentColor" />
+            <div style={{ marginBottom: '16px' }}>
+              <Mascot state="crying" size={120} />
             </div>
             <h2 className="modal-title">No Hearts Left!</h2>
             <p className="modal-body">
@@ -307,11 +468,12 @@ export default function LessonPage({ params }: LessonPageProps) {
         </div>
       )}
 
+      {/* Lesson Complete Modal Popup */}
       {showCompleteModal && completeStats && (
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '520px' }}>
-            <div style={{ color: 'var(--color-gold)', marginBottom: '16px' }}>
-              <Award size={64} fill="currentColor" stroke="white" />
+            <div style={{ marginBottom: '16px' }}>
+              <Mascot state="celebrating" size={140} />
             </div>
             <h2 className="modal-title">Lesson Complete!</h2>
             <p className="modal-body" style={{ marginBottom: '24px' }}>
@@ -325,7 +487,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               </div>
               <div className="complete-stat-card accuracy">
                 <span className="complete-stat-value">
-                  {completeStats.perfect ? '100%' : 'Great'}
+                  {completeStats.perfect ? '100%' : 'Completed'}
                 </span>
                 <span className="complete-stat-label">Accuracy</span>
               </div>

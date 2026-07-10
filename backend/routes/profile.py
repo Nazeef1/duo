@@ -36,6 +36,7 @@ def get_profile(db: Session = Depends(get_db)):
     ).count()
 
     achievements_list = [ach.code for ach in user.achievements]
+    opened_chests_list = [c.chest_id for c in user.opened_chests]
 
     return {
         "username": user.username,
@@ -46,7 +47,8 @@ def get_profile(db: Session = Depends(get_db)):
         "achievements": achievements_list,
         "skills_completed": skills_completed,
         "joined_at": user.created_at,
-        "daily_xp_goal": user.daily_xp_goal
+        "daily_xp_goal": user.daily_xp_goal,
+        "opened_chests": opened_chests_list
     }
 
 @router.patch("/profile", response_model=schemas.ProfileResponse)
@@ -79,3 +81,37 @@ def refill_hearts(db: Session = Depends(get_db)):
     db.commit()
     
     return {"hearts": 5}
+
+@router.post("/chests/open", response_model=schemas.ChestOpenResponse)
+def open_chest(payload: schemas.ChestOpenRequest, db: Session = Depends(get_db)):
+    user_id = 1
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Check if chest already opened
+    existing = db.query(models.OpenedChest).filter(
+        models.OpenedChest.user_id == user_id,
+        models.OpenedChest.chest_id == payload.chest_id
+    ).first()
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="Chest already opened")
+
+    # Open chest
+    opened = models.OpenedChest(user_id=user_id, chest_id=payload.chest_id)
+    db.add(opened)
+    
+    # Award gems
+    gems_earned = 20
+    user.gems += gems_earned
+    
+    db.commit()
+    db.refresh(user)
+    
+    return {
+        "chest_id": payload.chest_id,
+        "gems_earned": gems_earned,
+        "total_gems": user.gems
+    }
+

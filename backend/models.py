@@ -19,6 +19,7 @@ class User(Base):
     xp_transactions = relationship("XPTransaction", back_populates="user", cascade="all, delete-orphan")
     streak_logs = relationship("StreakLog", back_populates="user", cascade="all, delete-orphan")
     achievements = relationship("Achievement", back_populates="user", cascade="all, delete-orphan")
+    opened_chests = relationship("OpenedChest", back_populates="user", cascade="all, delete-orphan")
 
 class Course(Base):
     __tablename__ = "courses"
@@ -148,3 +149,16 @@ class Achievement(Base):
     earned_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     user = relationship("User", back_populates="achievements")
+
+class OpenedChest(Base):
+    __tablename__ = "opened_chests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    chest_id = Column(String)  # e.g., "chest_1"
+    opened_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    __table_args__ = (UniqueConstraint("user_id", "chest_id", name="uq_user_chest"),)
+
+    user = relationship("User", back_populates="opened_chests")
+
