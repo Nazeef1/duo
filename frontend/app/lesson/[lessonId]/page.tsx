@@ -22,7 +22,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   const resolvedParams = use(params);
   const lessonId = parseInt(resolvedParams.lessonId);
 
-  const { hearts, refillHearts, reconcileHearts, updateLocalStats } = useUserStore();
+  const { hearts, refillHearts, reconcileHearts, updateLocalStats, openChest } = useUserStore();
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [attemptId, setAttemptId] = useState<number | null>(null);
@@ -243,6 +243,22 @@ export default function LessonPage({ params }: LessonPageProps) {
         sound.playComplete();
         try {
           const res = await api.completeAttempt(attemptId);
+          
+          // Check if this is a Unit Review attempt and record completion in database
+          if (typeof window !== 'undefined') {
+            const searchParams = new URLSearchParams(window.location.search);
+            if (searchParams.get('isUnitReview') === 'true') {
+              const uId = searchParams.get('unitId');
+              if (uId) {
+                try {
+                  await openChest(`unit_review_${uId}`);
+                } catch (chestErr) {
+                  console.error('Error recording unit review chest completion:', chestErr);
+                }
+              }
+            }
+          }
+
           setCompleteStats({
             xp_earned: res.xp_earned,
             perfect: res.perfect,
@@ -290,8 +306,8 @@ export default function LessonPage({ params }: LessonPageProps) {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        backgroundColor: '#ffffff',
-        color: '#3c3c3c',
+        backgroundColor: 'var(--bg-primary)',
+        color: 'var(--text-dark)',
         fontFamily: 'var(--font-nunito)',
         padding: '24px'
       }}>
@@ -327,7 +343,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               {completeStats.perfect ? 'Perfect lesson!' : 'Lesson complete!'}
             </h1>
             <p style={{
-              color: '#afafaf',
+              color: 'var(--text-muted)',
               fontSize: '18px',
               fontWeight: 700
             }}>
@@ -369,7 +385,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 justifyContent: 'center',
                 gap: '12px',
                 padding: '20px 12px',
-                backgroundColor: '#ffffff'
+                backgroundColor: 'var(--bg-secondary)'
               }}>
                 <img src="/icons/lightning.png" alt="XP" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
                 <span style={{ fontSize: '28px', fontWeight: 900, color: '#ffc800' }}>
@@ -404,7 +420,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 justifyContent: 'center',
                 gap: '12px',
                 padding: '20px 12px',
-                backgroundColor: '#ffffff'
+                backgroundColor: 'var(--bg-secondary)'
               }}>
                 <img src="/icons/target.png" alt="Accuracy" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
                 <span style={{ fontSize: '28px', fontWeight: 900, color: '#58cc02' }}>
@@ -419,7 +435,7 @@ export default function LessonPage({ params }: LessonPageProps) {
         <div style={{
           width: '100%',
           maxWidth: '600px',
-          borderTop: '2px solid #e5e5e5',
+          borderTop: '2px solid var(--border-color)',
           paddingTop: '20px',
           display: 'flex',
           justifyContent: 'space-between',
@@ -430,16 +446,18 @@ export default function LessonPage({ params }: LessonPageProps) {
             onClick={() => {
               router.push('/');
             }}
-            className="btn-3d btn-gray"
+            className="btn-3d"
             style={{
-              backgroundColor: '#ffffff',
-              color: '#afafaf',
-              borderColor: '#e5e5e5',
-              boxShadow: '0 4px 0 #e5e5e5',
+              backgroundColor: 'var(--bg-secondary)',
+              color: 'var(--text-muted)',
+              border: '2px solid var(--border-color)',
+              borderBottom: '4px solid var(--border-color)',
               flex: 1,
               padding: '16px',
               fontSize: '16px',
-              borderRadius: '16px'
+              borderRadius: '16px',
+              fontWeight: 800,
+              cursor: 'pointer'
             }}
           >
             Review Lesson

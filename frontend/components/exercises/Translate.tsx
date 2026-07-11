@@ -53,19 +53,35 @@ export default function Translate({ data, selectedAnswer, onChange, disabled }: 
       }}>
         {/* Character mascot */}
         <div style={{ flexShrink: 0 }}>
-          <img
-            src="/mascot/mainicon.png"
-            alt="Character"
-            style={{
-              width: '72px',
-              height: '72px',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
-            }}
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
+          {(() => {
+            const CHARACTERS = [
+              '/mascot/lily.jpg',
+              '/mascot/Lucy.png',
+              '/mascot/vikram.png',
+              '/mascot/falstaff.png',
+              '/mascot/girl.png',
+              '/mascot/duo_study.png'
+            ];
+            const charIndex = data.prompt.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % CHARACTERS.length;
+            const characterSrc = CHARACTERS[charIndex];
+            return (
+              <img
+                src={characterSrc}
+                alt="Character"
+                style={{
+                  width: '84px',
+                  height: '84px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: '3px solid var(--border-color)',
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+                }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            );
+          })()}
         </div>
 
         {/* Speech bubble */}

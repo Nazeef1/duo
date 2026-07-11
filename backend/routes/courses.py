@@ -44,13 +44,29 @@ def get_course_path(course_id: int, db: Session = Depends(get_db)):
     for prog in db_progress:
         progress_map[prog.skill_id] = prog
 
+    # Fetch completed unit reviews (stored in opened_chests table)
+    opened_chests = db.query(models.OpenedChest).filter(models.OpenedChest.user_id == user_id).all()
+    completed_reviews = {c.chest_id for c in opened_chests if c.chest_id.startswith("unit_review_")}
+
+    # Map unit IDs to their order_index and find previous unit for each unit
+    unit_order_map = {u.id: u.order_index for u in units}
+    unit_by_order = {u.order_index: u for u in units}
+
     # Determine dynamic statuses
-    # Linear progression: First skill is available.
-    # Subsequent skills are available if the previous one is completed.
     resolved_skills = {}
     previous_completed = True  # The "before first" skill is considered completed to unlock the first one
 
     for index, skill in enumerate(flat_skills):
+        current_unit_id = skill_unit_map[skill.id]
+        current_unit_order = unit_order_map[current_unit_id]
+
+        # Is the previous unit review completed? (Only matters if unit_order > 0)
+        previous_unit_review_completed = True
+        if current_unit_order > 0:
+            prev_unit = unit_by_order.get(current_unit_order - 1)
+            if prev_unit:
+                previous_unit_review_completed = f"unit_review_{prev_unit.id}" in completed_reviews
+
         prog = progress_map.get(skill.id)
         crowns = prog.crowns if prog else 0
         total_lessons = len(skill.lessons)
@@ -69,7 +85,7 @@ def get_course_path(course_id: int, db: Session = Depends(get_db)):
             elif prog.status != "completed":
                 prog.status = "completed"
                 db.commit()
-        elif previous_completed:
+        elif previous_completed and previous_unit_review_completed:
             status = "available"
             if prog and prog.status != "available":
                 prog.status = "available"

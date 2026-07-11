@@ -170,9 +170,9 @@ export default function SkillNode({
           <div 
             className="skill-node-inner"
             style={{
-              backgroundColor: isLocked ? '#37464f' : '#ffc800',
-              borderColor: isLocked ? '#202f36' : '#e6a100',
-              boxShadow: isLocked ? '0 6px 0 #202f36' : '0 6px 0 #e6a100',
+              backgroundColor: isLocked ? '#37464f' : themeColor,
+              borderColor: isLocked ? '#202f36' : getThemeDark(themeColor),
+              boxShadow: isLocked ? '0 6px 0 #202f36' : `0 6px 0 ${getThemeDark(themeColor)}`,
               width: '80px',
               height: '80px',
               borderRadius: '50%',
@@ -189,7 +189,7 @@ export default function SkillNode({
               />
             ) : (
               <img 
-                src="/icons/final_review_lesson_completed.svg" 
+                src={themeColor === '#1cb0f6' ? '/icons/final review blue.svg' : '/icons/final review purple.svg'} 
                 alt="Final Review Completed" 
                 style={{ width: '42px', height: '34px', objectFit: 'contain' }}
               />
@@ -201,13 +201,31 @@ export default function SkillNode({
         </div>
 
         {popoverOpen && !isLocked && (
-          <div className="skill-popover">
+          <div 
+            className="skill-popover"
+            style={{
+              ['--popover-bg' as any]: themeColor,
+              ['--popover-bg-dark' as any]: getThemeDark(themeColor)
+            } as React.CSSProperties}
+          >
             <h4 className="skill-popover-title">Unit Review</h4>
             <p className="skill-popover-subtitle">Practice unit exercises and test your skills!</p>
             <Link 
-              href="/lesson/1"
-              className="btn-3d btn-green"
-              style={{ padding: '10px 20px', fontSize: '14px', width: '100%' }}
+              href={`/lesson/${themeColor === '#1cb0f6' ? 4 : 10}?isUnitReview=true&unitId=${themeColor === '#1cb0f6' ? 1 : 2}`}
+              className="btn-3d"
+              style={{ 
+                padding: '10px 20px', 
+                fontSize: '14px', 
+                width: '100%',
+                backgroundColor: '#ffffff',
+                color: themeColor,
+                border: 'none',
+                borderBottom: '4px solid #e5e5e5',
+                borderRadius: '12px',
+                fontWeight: 800,
+                textAlign: 'center',
+                textTransform: 'uppercase'
+              }}
               onClick={() => setActivePopoverIndex(null)}
             >
               Start Review (+20 XP)
