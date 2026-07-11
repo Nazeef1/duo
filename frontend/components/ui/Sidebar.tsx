@@ -98,7 +98,7 @@ export default function Sidebar() {
       </ul>
       
       <div style={{ marginTop: 'auto', fontSize: '12px', color: 'var(--text-muted)', paddingLeft: '16px' }}>
-        © 2026 Duolingo Clone
+        For demo purposes only
       </div>
     </div>
   );

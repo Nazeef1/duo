@@ -1,5 +1,8 @@
 # Duolingo Web App Clone
 
+> [!IMPORTANT]
+> This application is built and provided for **demonstration and educational purposes only**.
+
 A full-stack, high-fidelity clone of the Duolingo web application. Built as a full-featured quiz and gamification platform featuring a linear skill progression path, an interactive exercise player with 5 question types, XP ledger logic, automatic heart regeneration, a live leaderboard, and achievements.
 
 ---
@@ -131,32 +134,8 @@ Open `http://localhost:3000` in your browser to experience the application.
 2.  **Heart Regeneration time**: Recovering hearts occurs automatically at a simulated frequency of 1 heart every 5 minutes (300 seconds) so that the recovery system is testable in a demo interview, rather than the real-world 4-hour interval.
 3.  **Hearts Refill**: Hearts can be refilled instantly via a mock button in the header or in the Out-of-Hearts popup without requiring real-world gem payment.
 
+
 ---
 
-## 🌐 Deployment Guide (Vercel & Render)
-
-You can easily host this application live for free using **Render** (for the backend FastAPI server) and **Vercel** (for the frontend Next.js application).
-
-### 1. Host the Backend on Render
-Render reads the `render.yaml` file present in the root folder to deploy the Python FastAPI backend as a Blueprint automatically:
-1. Sign up/log in to [Render](https://render.com/).
-2. Click **New** ➡️ **Blueprint** on your dashboard.
-3. Connect your GitHub repository `Nazeef1/duo`.
-4. Render will detect `render.yaml` and configure the service:
-   * **Service Name**: `duolingo-clone-backend`
-   * **Environment**: `python`
-   * **Build Command**: `pip install -r backend/requirements.txt && python -m backend.seed` (Automatically seeds the SQLite database with lessons, exercises, and mock users)
-   * **Start Command**: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
-5. Click **Approve** to build and deploy. Once the build completes, copy the generated public URL (e.g. `https://duolingo-clone-backend-xxxx.onrender.com`).
-
-### 2. Host the Frontend on Vercel
-1. Sign up/log in to [Vercel](https://vercel.com/).
-2. Click **Add New** ➡️ **Project**.
-3. Import your GitHub repository `Nazeef1/duo`.
-4. In the Project Configuration settings:
-   * **Framework Preset**: `Next.js`
-   * **Root Directory**: Click "Edit" and choose the `frontend` folder.
-   * **Environment Variables**: Add the following:
-     * **Key**: `NEXT_PUBLIC_API_URL`
-     * **Value**: Your Render backend public URL (e.g., `https://duolingo-clone-backend-xxxx.onrender.com`)
-5. Click **Deploy**. Vercel will build the frontend, and your web app will be live!
+> [!NOTE]
+> This project is designed for demonstration and portfolio use only. It is not intended for commercial production or use.
