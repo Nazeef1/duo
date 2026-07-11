@@ -21,7 +21,7 @@ export default function Sidebar() {
   const menuItems = [
     { name: 'Learn', path: '/', icon: '/icons/home.png' },
     { name: 'Practice', path: '/practice', icon: '/icons/dumbell.png' },
-    { name: 'Leaderboards', path: '/leaderboard', icon: '/icons/lightning.png' },
+    { name: 'Leaderboards', path: '/leaderboard', icon: '/icons/leaderboards.svg' },
     { name: 'Quests', path: '/quests', icon: '/icons/treasure-chest.png' },
     { name: 'Shop', path: '/shop', icon: '/icons/shop.png' },
     { name: 'Profile', path: '/profile', icon: null, isAvatar: true },

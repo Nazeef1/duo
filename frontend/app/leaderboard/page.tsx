@@ -7,18 +7,21 @@ import TopBar from '@/components/ui/TopBar';
 import { useUserStore } from '@/store/useUserStore';
 import { Trophy, Award, Star } from 'lucide-react';
 
-const LEAGUES = [
-  { name: 'Bronze', color: '#cd7f32', icon: '🥉' },
-  { name: 'Silver', color: '#afafaf', icon: '🥈' },
-  { name: 'Gold', color: '#ffc800', icon: '🥇' },
-  { name: 'Emerald', color: '#58cc02', icon: '💚' },
-  { name: 'Obsidian', color: '#a560e8', icon: '💜' },
+const LEAGUE_BADGES = [
+  { name: 'Gold', src: '/icons/gold.svg', isCurrent: false, isLocked: false },
+  { name: 'Sapphire', src: '/icons/bluebadge.svg', isCurrent: false, isLocked: false },
+  { name: 'Ruby', src: '/icons/redbadge.svg', isCurrent: false, isLocked: false },
+  { name: 'Emerald', src: '/icons/emeraldbadge.svg', isCurrent: true, isLocked: false },
+  { name: 'Locked 1', src: '/icons/lockedbadge.svg', isCurrent: false, isLocked: true },
+  { name: 'Locked 2', src: '/icons/lockedbadge.svg', isCurrent: false, isLocked: true },
+  { name: 'Locked 3', src: '/icons/lockedbadge.svg', isCurrent: false, isLocked: true },
 ];
 
 export default function LeaderboardPage() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedEmoji, setSelectedEmoji] = useState<string | null>('💪');
   const { username } = useUserStore();
 
   useEffect(() => {
@@ -82,33 +85,37 @@ export default function LeaderboardPage() {
         <div style={{ 
           display: 'flex', 
           justifyContent: 'center', 
-          gap: '8px', 
-          marginBottom: '32px',
+          alignItems: 'center',
+          gap: '12px', 
+          marginBottom: '24px',
           padding: '0 8px'
         }}>
-          {LEAGUES.map((league, idx) => {
-            const isActive = league.name === 'Bronze';
-            const isLocked = idx > 0;
+          {LEAGUE_BADGES.map((badge) => {
             return (
               <div
-                key={league.name}
-                title={league.name}
+                key={badge.name}
+                title={badge.name}
                 style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: isActive ? `3px solid ${league.color}` : '2px solid var(--border-color)',
-                  backgroundColor: isActive ? 'transparent' : 'var(--bg-secondary)',
-                  opacity: isLocked ? 0.4 : 1,
-                  fontSize: '28px',
-                  cursor: 'default',
-                  boxShadow: isActive ? `0 0 12px ${league.color}55` : 'none',
+                  position: 'relative',
+                  width: badge.isCurrent ? '72px' : '52px',
+                  height: badge.isCurrent ? '72px' : '52px',
+                  transform: badge.isCurrent ? 'scale(1.1)' : 'none',
+                  transition: 'transform 0.2s ease',
                 }}
               >
-                {league.icon}
+                <img 
+                  src={badge.src} 
+                  alt={badge.name} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'contain',
+                    opacity: badge.isLocked ? 0.5 : 1
+                  }} 
+                />
               </div>
             );
           })}
@@ -116,9 +123,9 @@ export default function LeaderboardPage() {
 
         {/* League Title & Subtitle */}
         <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-          <h2 className="leaderboard-title">Bronze League</h2>
+          <h2 className="leaderboard-title">Emerald League</h2>
           <p style={{ fontSize: '15px', color: 'var(--text-muted)', fontWeight: 700 }}>
-            Top {promotionZone} advance to the next league
+            Top 11 advance to the next league
           </p>
           <p style={{ 
             fontSize: '14px', 
@@ -126,7 +133,7 @@ export default function LeaderboardPage() {
             fontWeight: 800, 
             marginTop: '4px' 
           }}>
-            {timeRemaining} remaining
+            23 hours remaining
           </p>
         </div>
 
@@ -194,10 +201,33 @@ export default function LeaderboardPage() {
                       backgroundColor: isCurrentUser ? 'var(--color-blue)' : `hsl(${entry.username.charCodeAt(0) * 13 % 360}, 60%, 45%)`,
                       color: 'white',
                       fontSize: '16px',
-                      fontWeight: 900
+                      fontWeight: 900,
+                      position: 'relative'
                     }}
                   >
                     {entry.username[0].toUpperCase()}
+                    {isCurrentUser && selectedEmoji && (
+                      <div 
+                        style={{ 
+                          position: 'absolute', 
+                          top: '-8px', 
+                          right: '-8px', 
+                          backgroundColor: 'var(--bg-secondary)', 
+                          border: '1.5px solid var(--border-color)', 
+                          borderRadius: '50%', 
+                          width: '22px', 
+                          height: '22px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          fontSize: '12px',
+                          boxShadow: '0 2px 5px rgba(0,0,0,0.15)',
+                          zIndex: 10
+                        }}
+                      >
+                        {selectedEmoji}
+                      </div>
+                    )}
                   </div>
 
                   {/* Username */}
@@ -258,34 +288,91 @@ export default function LeaderboardPage() {
               backgroundColor: 'var(--bg-secondary)',
             }}
           >
-            <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '24px' }}>Set your status</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>Set your status</h3>
+              {selectedEmoji && (
+                <button 
+                  onClick={() => setSelectedEmoji(null)}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    color: 'var(--color-blue)', 
+                    fontSize: '13px', 
+                    fontWeight: 800, 
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#a560e8', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                <span style={{ fontSize: '32px' }}>😎</span>
-                <div style={{ position: 'absolute', bottom: 0, right: -10, backgroundColor: 'white', borderRadius: '50%', padding: '4px' }}>
+              <div style={{ position: 'relative' }}>
+                {/* Circular Avatar */}
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'var(--color-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', fontSize: '32px', fontWeight: 900 }}>
+                  {username[0].toUpperCase()}
+                </div>
+                {/* Selected status speech bubble */}
+                {selectedEmoji && (
+                  <div 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '-8px', 
+                      right: '-8px', 
+                      backgroundColor: 'var(--bg-secondary)', 
+                      border: '2px solid var(--border-color)', 
+                      borderRadius: '50%', 
+                      width: '32px', 
+                      height: '32px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      fontSize: '16px',
+                      boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+                      zIndex: 10
+                    }}
+                  >
+                    {selectedEmoji}
+                  </div>
+                )}
+                {/* Online status green dot */}
+                <div style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: 'white', borderRadius: '50%', padding: '4px' }}>
                   <div style={{ width: '12px', height: '12px', backgroundColor: 'var(--color-green)', borderRadius: '50%' }}></div>
                 </div>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
-              {['🔥', '💪', '👀', '🍿', '🇪🇸', '💯', '💩', '🏆', '👑', '😹'].map((emoji, i) => (
-                <div key={i} style={{ 
-                  height: '40px', 
-                  borderRadius: '8px', 
-                  backgroundColor: i === 0 ? 'rgba(88, 204, 2, 0.2)' : 'var(--bg-primary)', 
-                  border: i === 0 ? '2px solid var(--color-green)' : '2px solid transparent',
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  fontSize: '20px',
-                  cursor: 'pointer'
-                }}>
-                  {emoji}
-                </div>
-              ))}
+
+            {/* 12 selectable emojis, matching the grid on the reference image */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
+              {['😎', '🎉', '💪', '👀', '🍿', '🇪🇸', '🦉', '💯', '💩', '🏆', '👑', '🐱'].map((emoji) => {
+                const isSelected = selectedEmoji === emoji;
+                return (
+                  <button 
+                    key={emoji}
+                    onClick={() => setSelectedEmoji(emoji)}
+                    style={{ 
+                      height: '36px', 
+                      borderRadius: '8px', 
+                      backgroundColor: isSelected ? 'rgba(28, 176, 246, 0.15)' : 'var(--bg-primary)', 
+                      border: isSelected ? '2px solid #1cb0f6' : '2px solid var(--border-color)',
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      fontSize: '18px',
+                      cursor: 'pointer',
+                      padding: 0
+                    }}
+                  >
+                    {emoji}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
