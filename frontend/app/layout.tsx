@@ -36,6 +36,7 @@ export default function RootLayout({
       <head>
         <title>Duolingo - Learn Spanish</title>
         <meta name="description" content="A premium gamified Duolingo clone for learning Spanish." />
+        <link rel="icon" href="/mascot/duolingo_app-icon.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
