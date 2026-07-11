@@ -59,6 +59,51 @@ export default function LessonPage({ params }: LessonPageProps) {
     achievements: string[];
   } | null>(null);
 
+  // Animating complete stats
+  const [xpDisplay, setXpDisplay] = useState(0);
+  const [streakDisplay, setStreakDisplay] = useState(0);
+  const [flameActive, setFlameActive] = useState(false);
+  const [streakPulse, setStreakPulse] = useState(false);
+
+  useEffect(() => {
+    if (showCompleteModal && completeStats) {
+      // 1. Roll up XP
+      const targetXp = completeStats.xp_earned;
+      if (targetXp > 0) {
+        let currentXp = 0;
+        const duration = 800; // ms
+        const stepTime = Math.max(20, Math.floor(duration / targetXp));
+        const timer = setInterval(() => {
+          currentXp += 1;
+          if (currentXp >= targetXp) {
+            setXpDisplay(targetXp);
+            clearInterval(timer);
+          } else {
+            setXpDisplay(currentXp);
+          }
+        }, stepTime);
+      } else {
+        setXpDisplay(0);
+      }
+
+      // 2. Roll up Streak
+      const finalStreak = useUserStore.getState().streak;
+      const initialStreak = Math.max(0, finalStreak - 1);
+      setStreakDisplay(initialStreak);
+
+      const triggerStreak = setTimeout(() => {
+        setFlameActive(true);
+        setStreakDisplay(finalStreak);
+        setStreakPulse(true);
+        setTimeout(() => setStreakPulse(false), 500);
+      }, 700);
+
+      return () => {
+        clearTimeout(triggerStreak);
+      };
+    }
+  }, [showCompleteModal, completeStats]);
+
   useEffect(() => {
     const initLesson = async () => {
       try {
@@ -377,7 +422,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 textTransform: 'uppercase',
                 letterSpacing: '0.8px'
               }}>
-                TOTAL XP
+                XP EARNED
               </div>
               <div style={{
                 display: 'flex',
@@ -389,7 +434,50 @@ export default function LessonPage({ params }: LessonPageProps) {
               }}>
                 <img src="/icons/lightning.png" alt="XP" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
                 <span style={{ fontSize: '28px', fontWeight: 900, color: '#ffc800' }}>
-                  {completeStats.xp_earned}
+                  {xpDisplay}
+                </span>
+              </div>
+            </div>
+
+            {/* Streak Card */}
+            <div style={{
+              width: '160px',
+              borderRadius: '20px',
+              border: '2px solid #ff9600',
+              overflow: 'hidden',
+              boxShadow: '0 4px 0 #ff9600'
+            }}>
+              <div style={{
+                backgroundColor: '#ff9600',
+                color: '#ffffff',
+                textAlign: 'center',
+                padding: '6px 12px',
+                fontSize: '12px',
+                fontWeight: 900,
+                textTransform: 'uppercase',
+                letterSpacing: '0.8px'
+              }}>
+                STREAK
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+                padding: '20px 12px',
+                backgroundColor: 'var(--bg-secondary)'
+              }}>
+                <img 
+                  src="/icons/fire.svg" 
+                  alt="Streak" 
+                  className={flameActive ? 'flame-active' : ''}
+                  style={{ width: '32px', height: '32px', objectFit: 'contain', transition: 'transform 0.3s ease' }} 
+                />
+                <span 
+                  className={streakPulse ? 'number-pulse' : ''}
+                  style={{ fontSize: '28px', fontWeight: 900, color: '#ff9600', display: 'inline-block' }}
+                >
+                  {streakDisplay}
                 </span>
               </div>
             </div>
