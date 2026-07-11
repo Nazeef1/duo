@@ -351,7 +351,7 @@ export default function LearnPage() {
         </div>
 
         {/* Fixed Right Sidebar Widget Panels */}
-        <div className="right-sidebar" style={{ top: '24px', height: 'calc(100vh - 48px)' }}>
+        <div className="right-sidebar">
           {/* Stats row at the top */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 8px 8px 8px', marginBottom: '12px' }}>
             {/* Language Flag with hover courses dropdown */}
@@ -482,7 +482,7 @@ export default function LearnPage() {
           {/* 1. Super Duolingo Card */}
           <div 
             style={{ 
-              border: 'none', 
+              border: '2px solid var(--border-color)', 
               borderRadius: '16px', 
               padding: '24px', 
               background: 'linear-gradient(135deg, #a560e8 0%, #7622c8 100%)',
@@ -552,7 +552,7 @@ export default function LearnPage() {
             return (
               <div 
                 style={{ 
-                  border: 'none', 
+                  border: '2px solid var(--border-color)', 
                   borderRadius: '16px', 
                   padding: '24px', 
                   background: 'linear-gradient(135deg, #ff8a00 0%, #da1b60 100%)',
@@ -584,7 +584,7 @@ export default function LearnPage() {
           {/* 3. Daily Quests Card */}
           <div 
             style={{ 
-              border: 'none', 
+              border: '2px solid var(--border-color)', 
               borderRadius: '16px', 
               padding: '24px', 
               background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
@@ -603,7 +603,7 @@ export default function LearnPage() {
             {/* Quest 1: XP Quest */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               <img 
-                src="/icons/fire.png" 
+                src="/icons/fire.svg" 
                 alt="Streak Icon" 
                 style={{ width: '32px', height: '32px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }} 
               />
