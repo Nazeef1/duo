@@ -250,7 +250,7 @@ export default function SkillNode({
         onClick={handleNodeClick}
         className={`skill-node-circle ${skill.status}`}
       >
-        {skill.status !== 'locked' && (
+        {skill.status === 'available' && (
           <svg 
             width="96" 
             height="96" 
@@ -276,7 +276,7 @@ export default function SkillNode({
               cy="48" 
               r={radius} 
               fill="transparent" 
-              stroke={skill.status === 'completed' ? 'var(--color-gold)' : 'var(--color-green)'} 
+              stroke={themeColor} 
               strokeWidth="6" 
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
@@ -311,13 +311,6 @@ export default function SkillNode({
           )}
         </div>
       </button>
-
-      {skill.status !== 'locked' && skill.crowns > 0 && (
-        <div className="skill-node-crowns">
-          <Star size={11} fill="currentColor" stroke="none" />
-          <span>{skill.crowns}</span>
-        </div>
-      )}
 
       <div className={`skill-node-title ${skill.status === 'locked' ? 'locked' : ''}`}>
         {skill.title}
