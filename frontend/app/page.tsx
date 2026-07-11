@@ -114,15 +114,15 @@ export default function LearnPage() {
                     const currentIdx = flatIndex;
                     flatIndex += 1;
 
-                    // Zig-zag pattern logic - Widen swings to 120px for a more pronounced curve
-                    const pattern = [0, -60, -120, -60, 0, 60, 120, 60];
+                    // Zig-zag pattern logic - Widen swings to 150px for a more pronounced curve
+                    const pattern = [0, -75, -150, -75, 0, 75, 150, 75];
                     const offset = pattern[currentIdx % pattern.length];
-
+ 
                     // Render primary Skill Node
                     nodesToRender.push(
                       <div key={`skill-wrapper-${skill.id}`} style={{ position: 'relative', transform: `translateX(${offset}px)`, zIndex: activePopoverIndex === currentIdx ? 99 : 1 }}>
-                        {/* 1. Animated mascot Lily clapping GIF next to Unit 1, Skill 1 (right side empty space) */}
-                        {unitIdx === 0 && skillIdx === 0 && (
+                        {/* 1. Animated mascot Lily clapping GIF next to Unit 1, Skill 3 (right side empty space - midway) */}
+                        {unitIdx === 0 && skillIdx === 2 && (
                           <div 
                             onClick={(e) => {
                               e.stopPropagation();
@@ -131,11 +131,11 @@ export default function LearnPage() {
                             }}
                             style={{ 
                               position: 'absolute', 
-                              right: '-180px', 
-                              top: '-20px', 
+                              right: '-195px', 
+                              top: '-30px', 
                               zIndex: 15, 
-                              width: '150px', 
-                              height: '150px', 
+                              width: '190px', 
+                              height: '190px', 
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -145,12 +145,12 @@ export default function LearnPage() {
                             <img 
                               src="/mascot/claplyn.gif" 
                               alt="Lily Clapping" 
-                              style={{ width: '130px', height: '130px', objectFit: 'contain' }} 
+                              style={{ width: '165px', height: '165px', objectFit: 'contain' }} 
                             />
                             {lilyBubbleOpen && (
                               <div style={{
                                 position: 'absolute',
-                                bottom: '130px',
+                                bottom: '165px',
                                 left: '50%',
                                 transform: 'translateX(-50%)',
                                 backgroundColor: 'var(--bg-secondary)',
@@ -181,9 +181,9 @@ export default function LearnPage() {
                             )}
                           </div>
                         )}
-
-                        {/* 2. Animated Flexing Duo GIF next to Unit 2, Skill 1 (left side empty space) */}
-                        {unitIdx === 1 && skillIdx === 0 && (
+ 
+                        {/* 2. Animated Flexing Duo GIF next to Unit 2, Skill 2 (left side empty space - midway) */}
+                        {unitIdx === 1 && skillIdx === 1 && (
                           <div 
                             onClick={(e) => {
                               e.stopPropagation();
@@ -192,11 +192,11 @@ export default function LearnPage() {
                             }}
                             style={{ 
                               position: 'absolute', 
-                              left: '-180px', 
-                              top: '-20px', 
+                              left: '-195px', 
+                              top: '-30px', 
                               zIndex: 15, 
-                              width: '150px', 
-                              height: '150px', 
+                              width: '190px', 
+                              height: '190px', 
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -206,12 +206,12 @@ export default function LearnPage() {
                             <img 
                               src="/mascot/duostrong.gif" 
                               alt="Strong Duo" 
-                              style={{ width: '130px', height: '130px', objectFit: 'contain' }} 
+                              style={{ width: '165px', height: '165px', objectFit: 'contain' }} 
                             />
                             {duoBubbleOpen && (
                               <div style={{
                                 position: 'absolute',
-                                bottom: '130px',
+                                bottom: '165px',
                                 left: '50%',
                                 transform: 'translateX(-50%)',
                                 backgroundColor: 'var(--bg-secondary)',
@@ -330,7 +330,7 @@ export default function LearnPage() {
               <img 
                 src="/icons/spain.png" 
                 alt="Spanish" 
-                style={{ width: '28px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
+                style={{ width: '32px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} 
               />
             </div>
 
@@ -339,9 +339,9 @@ export default function LearnPage() {
               <img 
                 src="/icons/fire.png" 
                 alt="Streak" 
-                style={{ width: '22px', height: '22px', objectFit: 'contain' }} 
+                style={{ width: '26px', height: '26px', objectFit: 'contain' }} 
               />
-              <span style={{ fontSize: '16px', fontWeight: 900 }}>{streak}</span>
+              <span style={{ fontSize: '18px', fontWeight: 900 }}>{streak}</span>
             </div>
 
             {/* Gems */}
@@ -349,15 +349,15 @@ export default function LearnPage() {
               <img 
                 src="/icons/gem.png" 
                 alt="Gems" 
-                style={{ width: '22px', height: '22px', objectFit: 'contain' }} 
+                style={{ width: '26px', height: '26px', objectFit: 'contain' }} 
               />
-              <span style={{ fontSize: '16px', fontWeight: 900 }}>{gems}</span>
+              <span style={{ fontSize: '18px', fontWeight: 900 }}>{gems}</span>
             </div>
 
             {/* Hearts */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-red)' }}>
-              <Heart size={20} fill="var(--color-red)" stroke="none" />
-              <span style={{ fontSize: '16px', fontWeight: 900 }}>{hearts}</span>
+              <Heart size={24} fill="var(--color-red)" stroke="none" />
+              <span style={{ fontSize: '18px', fontWeight: 900 }}>{hearts}</span>
               {hearts < 5 && (
                 <button 
                   onClick={handleRefill} 
@@ -373,7 +373,7 @@ export default function LearnPage() {
                   }}
                   title="Refill Hearts"
                 >
-                  <PlusCircle size={16} fill="none" stroke="currentColor" />
+                  <PlusCircle size={18} fill="none" stroke="currentColor" />
                 </button>
               )}
             </div>
@@ -382,11 +382,12 @@ export default function LearnPage() {
           {/* 1. Super Duolingo Card */}
           <div 
             style={{ 
-              border: '2px solid var(--border-color)', 
-              borderBottom: '5px solid var(--border-color)',
+              border: 'none', 
               borderRadius: '16px', 
-              padding: '16px', 
-              backgroundColor: 'var(--bg-secondary)',
+              padding: '20px', 
+              background: 'linear-gradient(135deg, #a560e8 0%, #7622c8 100%)',
+              color: '#ffffff',
+              boxShadow: '0 8px 16px rgba(165, 96, 232, 0.25)',
               position: 'relative'
             }}
           >
@@ -394,20 +395,20 @@ export default function LearnPage() {
               <div>
                 <span 
                   style={{ 
-                    backgroundColor: 'var(--color-purple)', 
-                    color: 'white', 
-                    fontSize: '10px', 
+                    backgroundColor: '#ffffff', 
+                    color: '#7622c8', 
+                    fontSize: '11px', 
                     fontWeight: 900, 
-                    padding: '2px 8px', 
+                    padding: '3px 10px', 
                     borderRadius: '6px',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
+                    letterSpacing: '0.8px'
                   }}
                 >
                   Super
                 </span>
-                <h4 style={{ fontSize: '15px', fontWeight: 900, marginTop: '8px' }}>Try Super for free</h4>
-                <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px', lineHeight: '1.4' }}>
+                <h4 style={{ fontSize: '18px', fontWeight: 900, marginTop: '12px', color: '#ffffff', margin: '8px 0 0 0' }}>Try Super for free</h4>
+                <p style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600, marginTop: '6px', lineHeight: '1.4' }}>
                   No ads, personalized practice, and unlimited Legendary!
                 </p>
               </div>
@@ -415,13 +416,26 @@ export default function LearnPage() {
                 <img 
                   src="/mascot/duosword.png" 
                   alt="Super Duo" 
-                  style={{ width: '52px', height: '52px', objectFit: 'contain' }} 
+                  style={{ width: '68px', height: '68px', objectFit: 'contain' }} 
                 />
               </div>
             </div>
             <button 
-              className="btn-3d btn-purple" 
-              style={{ width: '100%', padding: '10px', fontSize: '13px', backgroundColor: 'var(--color-purple)', borderColor: 'var(--color-purple)' }}
+              className="btn-3d" 
+              style={{ 
+                width: '100%', 
+                padding: '12px', 
+                fontSize: '14px', 
+                backgroundColor: '#ffffff', 
+                color: '#7622c8',
+                border: 'none',
+                borderBottom: '4px solid #e5e5e5',
+                borderRadius: '12px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                textTransform: 'uppercase',
+                textAlign: 'center'
+              }}
               onClick={() => alert("Super Duolingo Trial Activated!")}
             >
               Try 1 Week Free
@@ -436,18 +450,27 @@ export default function LearnPage() {
             const promotionZone = Math.ceil(total * 0.3);
             const ranksToPromotion = Math.max(0, myRank - promotionZone);
             return (
-              <div style={{ border: '2px solid var(--border-color)', borderBottom: '5px solid var(--border-color)', borderRadius: '16px', padding: '16px', backgroundColor: 'var(--bg-secondary)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: 900 }}>Bronze League</h4>
-                  <Link href="/leaderboard" style={{ fontSize: '12px', color: 'var(--color-blue)', fontWeight: 800, textDecoration: 'none' }}>VIEW LEAGUE</Link>
+              <div 
+                style={{ 
+                  border: 'none', 
+                  borderRadius: '16px', 
+                  padding: '20px', 
+                  background: 'linear-gradient(135deg, #ff8a00 0%, #da1b60 100%)',
+                  color: '#ffffff',
+                  boxShadow: '0 8px 16px rgba(218, 27, 96, 0.25)' 
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 900, color: '#ffffff', margin: 0 }}>Bronze League</h4>
+                  <Link href="/leaderboard" style={{ fontSize: '12px', color: '#ffffff', fontWeight: 900, textDecoration: 'none', borderBottom: '1px dashed rgba(255,255,255,0.8)', opacity: 0.9 }}>VIEW LEAGUE</Link>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <div style={{ fontSize: '28px' }}>🥉</div>
+                  <div style={{ fontSize: '38px', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>🥉</div>
                   <div>
-                    <div style={{ fontSize: '14px', fontWeight: 900 }}>
-                      You're ranked <span style={{ color: 'var(--color-green)' }}>#{myRank}</span>
+                    <div style={{ fontSize: '15px', fontWeight: 900 }}>
+                      You're ranked <span style={{ color: '#ffffff', textDecoration: 'underline' }}>#{myRank}</span>
                     </div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>
+                    <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600, marginTop: '4px' }}>
                       {ranksToPromotion > 0 
                         ? `${ranksToPromotion} ranks away from promotion!`
                         : '🎉 You are in the promotion zone!'}
@@ -459,25 +482,34 @@ export default function LearnPage() {
           })()}
 
           {/* 3. Daily Quests Card */}
-          <div style={{ border: '2px solid var(--border-color)', borderBottom: '5px solid var(--border-color)', borderRadius: '16px', padding: '16px', backgroundColor: 'var(--bg-secondary)' }}>
+          <div 
+            style={{ 
+              border: 'none', 
+              borderRadius: '16px', 
+              padding: '20px', 
+              background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+              color: '#ffffff',
+              boxShadow: '0 8px 16px rgba(17, 153, 142, 0.25)' 
+            }}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h4 style={{ fontSize: '15px', fontWeight: 900 }}>Daily Quests</h4>
-              <Link href="/quests" style={{ fontSize: '12px', color: 'var(--color-blue)', fontWeight: 800, textDecoration: 'none' }}>VIEW ALL</Link>
+              <h4 style={{ fontSize: '18px', fontWeight: 900, color: '#ffffff', margin: 0 }}>Daily Quests</h4>
+              <Link href="/quests" style={{ fontSize: '12px', color: '#ffffff', fontWeight: 900, textDecoration: 'none', borderBottom: '1px dashed rgba(255,255,255,0.8)', opacity: 0.9 }}>VIEW ALL</Link>
             </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               <img 
                 src="/icons/fire.png" 
                 alt="Streak Icon" 
-                style={{ width: '28px', height: '28px', objectFit: 'contain' }} 
+                style={{ width: '36px', height: '36px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }} 
               />
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '13px', fontWeight: 800 }}>Earn {dailyGoal} XP</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-                  <div className="progress-bar-container" style={{ height: '8px', flex: 1 }}>
-                    <div className="progress-bar-fill" style={{ width: `${dailyProgressPercent}%`, backgroundColor: 'var(--color-gold)' }} />
+                <div style={{ fontSize: '15px', fontWeight: 800 }}>Earn {dailyGoal} XP</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '6px' }}>
+                  <div className="progress-bar-container" style={{ height: '10px', flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.25)' }}>
+                    <div className="progress-bar-fill" style={{ width: `${dailyProgressPercent}%`, backgroundColor: '#ffc800' }} />
                   </div>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 800 }}>{xp}/{dailyGoal}</span>
+                  <span style={{ fontSize: '13px', color: '#ffffff', fontWeight: 800 }}>{xp}/{dailyGoal}</span>
                 </div>
               </div>
             </div>
