@@ -81,22 +81,17 @@ export default function SkillNode({
         >
           <div className="chest-node-inner">
             {isOpen ? (
-              <span style={{ fontSize: '24px', opacity: 0.5 }}>💨</span>
+              <img 
+                src="/icons/chest_opened.svg" 
+                alt="Chest Opened" 
+                style={{ width: '80px', height: '80px', objectFit: 'contain' }}
+              />
             ) : isLocked ? (
-              <div 
-                style={{ 
-                  width: '64px', 
-                  height: '64px', 
-                  backgroundColor: '#37464f', 
-                  borderRadius: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px solid #202f36'
-                }}
-              >
-                <Lock size={24} style={{ color: 'var(--text-muted)' }} />
-              </div>
+              <img 
+                src="/icons/chest_locked.svg" 
+                alt="Chest Locked" 
+                style={{ width: '80px', height: '80px', objectFit: 'contain' }}
+              />
             ) : (
               <img 
                 src="/icons/treasure-chest.png" 
@@ -175,9 +170,9 @@ export default function SkillNode({
           <div 
             className="skill-node-inner"
             style={{
-              backgroundColor: isLocked ? '#37464f' : 'var(--color-gold)',
-              borderColor: isLocked ? '#202f36' : 'var(--color-gold-dark)',
-              boxShadow: isLocked ? '0 6px 0 #202f36' : '0 6px 0 var(--color-gold-dark)',
+              backgroundColor: isLocked ? '#37464f' : '#ffc800',
+              borderColor: isLocked ? '#202f36' : '#e6a100',
+              boxShadow: isLocked ? '0 6px 0 #202f36' : '0 6px 0 #e6a100',
               width: '80px',
               height: '80px',
               borderRadius: '50%',
@@ -186,7 +181,19 @@ export default function SkillNode({
               justifyContent: 'center'
             }}
           >
-            <Trophy size={32} fill={isLocked ? 'none' : 'currentColor'} style={{ color: isLocked ? 'var(--text-muted)' : 'var(--bg-primary)' }} />
+            {isLocked ? (
+              <img 
+                src="/icons/final_review_lesson_locked.svg" 
+                alt="Final Review Locked" 
+                style={{ width: '42px', height: '34px', objectFit: 'contain' }}
+              />
+            ) : (
+              <img 
+                src="/icons/final_review_lesson_completed.svg" 
+                alt="Final Review Completed" 
+                style={{ width: '42px', height: '34px', objectFit: 'contain' }}
+              />
+            )}
           </div>
         </button>
         <div className="skill-node-title" style={{ color: isLocked ? 'var(--text-muted)' : 'var(--text-dark)', fontSize: '14px', fontWeight: '900' }}>
@@ -218,11 +225,22 @@ export default function SkillNode({
   const progressPercent = skill.total_lessons > 0 ? (skill.crowns / skill.total_lessons) : 0;
   const strokeDashoffset = circumference - progressPercent * circumference;
 
-  // Check if this skill is in legendary status
-  // In our schema, we can check: if crowns == total_lessons and status is completed, the user can upgrade it to legendary!
-  // Let's store legendary in local state or derive: if crowns == total_lessons and user completed legendary challenge, it turns legendary.
-  // Let's check if the crowns are completed. If crowns == total_lessons, they can unlock Legendary challenge!
   const isCompleted = skill.status === 'completed';
+
+  const getCircleStyle = () => {
+    if (skill.status === 'locked') {
+      return {
+        backgroundColor: '#37464f',
+        borderColor: '#202f36',
+        boxShadow: '0 6px 0 #202f36'
+      };
+    }
+    return {
+      backgroundColor: themeColor,
+      borderColor: getThemeDark(themeColor),
+      boxShadow: `0 6px 0 ${getThemeDark(themeColor)}`
+    };
+  };
 
   return (
     <div 
@@ -268,11 +286,28 @@ export default function SkillNode({
           </svg>
         )}
 
-        <div className="skill-node-inner">
+        <div 
+          className="skill-node-inner"
+          style={{
+            ...getCircleStyle(),
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
           {skill.status === 'locked' ? (
-            <Lock size={28} />
+            <StarIcon fill="#52656D" />
+          ) : skill.status === 'completed' ? (
+            <img 
+              src={themeColor === '#1cb0f6' ? '/icons/lessons_blue.svg' : '/icons/lessons_purple.svg'} 
+              alt="Completed Checkmark" 
+              style={{ width: '42px', height: '34px', objectFit: 'contain' }}
+            />
           ) : (
-            <Star size={28} fill="currentColor" />
+            <StarIcon fill="#ffffff" />
           )}
         </div>
       </button>
@@ -401,4 +436,16 @@ function getThemeDark(color: string): string {
   if (color === '#1cb0f6') return '#1485ba'; // dark blue
   if (color === '#a560e8') return '#843cd0'; // dark purple
   return '#1485ba';
+}
+
+// Inline StarIcon drawing the shape of lesson_locked.svg but with a dynamic fill
+function StarIcon({ fill }: { fill: string }) {
+  return (
+    <svg width="30" height="28" viewBox="0 0 31 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path 
+        d="M13.0456 2.34516C13.9532 0.463071 16.6337 0.463071 17.5414 2.34516L20.1473 7.74877C20.5184 8.51827 21.2574 9.04448 22.1059 9.14351L28.0841 9.84121C30.2204 10.0905 31.0618 12.745 29.4593 14.1795L25.1779 18.0121C24.5174 18.6033 24.2201 19.5006 24.3969 20.3693L25.5403 25.9866C25.9618 28.0576 23.7792 29.6823 21.9162 28.6842L16.472 25.7675C15.7358 25.3731 14.8511 25.3731 14.1149 25.7675L8.67068 28.6842C6.80774 29.6823 4.62508 28.0576 5.04661 25.9866L6.18997 20.3693C6.36679 19.5006 6.06951 18.6033 5.40899 18.0121L1.12761 14.1795C-0.474924 12.745 0.366528 10.0905 2.50284 9.84121L8.48098 9.14351C9.32953 9.04448 10.0685 8.51827 10.4396 7.74877L13.0456 2.34516Z" 
+        fill={fill}
+      />
+    </svg>
+  );
 }
