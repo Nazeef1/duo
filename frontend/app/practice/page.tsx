@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useUserStore } from '@/store/useUserStore';
-import TopBar from '@/components/ui/TopBar';
 import { Heart, PlusCircle, Headphones, AlertTriangle } from 'lucide-react';
 
 export default function PracticeHubPage() {
@@ -49,13 +48,11 @@ export default function PracticeHubPage() {
           zIndex: 85 
         }} 
       />
-      <TopBar />
 
-      <div className="quest-page-layout" style={{ paddingTop: '24px' }}>
-        <div className="quest-main-container">
-          
-          {/* LEFT COLUMN: Practice Hub Content */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      <div style={{ display: 'flex', flex: 1, maxWidth: '1040px', margin: '0 auto', width: '100%', padding: '0 24px' }}>
+        
+        {/* LEFT COLUMN: Practice Hub Content */}
+        <div className="path-layout" style={{ position: 'relative', flex: 1, paddingTop: '24px', paddingRight: '48px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
             
             {/* Section 1: Today's Review */}
             <div>
@@ -538,8 +535,6 @@ export default function PracticeHubPage() {
                 </div>
               </div>
             </div>
-
-          </div>
 
         </div>
       </div>
