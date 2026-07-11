@@ -2,7 +2,7 @@
 // Automatically attempts to find and load a native Spanish speaker voice.
 
 export const speech = {
-  speak: (text: string) => {
+  speak: (text: string, lang?: 'es' | 'en') => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
     // Cancel any ongoing speech
@@ -10,17 +10,24 @@ export const speech = {
 
     const utterance = new SpeechSynthesisUtterance(text);
     
-    // Find a Spanish voice
+    // Determine language: explicit or auto-detected
+    let targetLang = lang;
+    if (!targetLang) {
+      const hasSpanishChars = /[¿¡ñáéíóúü]/i.test(text);
+      const isEnglishInstruction = /choose|translation|translate|match|type|select|write/i.test(text);
+      targetLang = (hasSpanishChars || !isEnglishInstruction) ? 'es' : 'en';
+    }
+
     const voices = window.speechSynthesis.getVoices();
-    const esVoice = voices.find(v => v.lang.startsWith('es'));
+    const targetVoice = voices.find(v => v.lang.toLowerCase().startsWith(targetLang || 'es'));
     
-    if (esVoice) {
-      utterance.voice = esVoice;
+    if (targetVoice) {
+      utterance.voice = targetVoice;
     }
     
     // Set parameters
-    utterance.lang = 'es-ES';
-    utterance.rate = 0.85; // Slightly slower for better learning clarity, similar to Duolingo
+    utterance.lang = targetLang === 'es' ? 'es-ES' : 'en-US';
+    utterance.rate = targetLang === 'es' ? 0.85 : 1.0; // Slightly slower for Spanish learning clarity
     utterance.pitch = 1.0;
 
     window.speechSynthesis.speak(utterance);

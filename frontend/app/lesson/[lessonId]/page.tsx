@@ -22,7 +22,12 @@ export default function LessonPage({ params }: LessonPageProps) {
   const resolvedParams = use(params);
   const lessonId = parseInt(resolvedParams.lessonId);
 
-  const { hearts, refillHearts, reconcileHearts, updateLocalStats, openChest } = useUserStore();
+  const { hearts, refillHearts, reconcileHearts, updateLocalStats, openChest, loadPreferences } = useUserStore();
+
+  // Lesson progress tracking
+  const [totalExercisesCount, setTotalExercisesCount] = useState(0);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [mistakeCount, setMistakeCount] = useState(0);
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [attemptId, setAttemptId] = useState<number | null>(null);
@@ -105,6 +110,10 @@ export default function LessonPage({ params }: LessonPageProps) {
   }, [showCompleteModal, completeStats]);
 
   useEffect(() => {
+    loadPreferences();
+  }, [loadPreferences]);
+
+  useEffect(() => {
     const initLesson = async () => {
       try {
         setLoading(true);
@@ -120,6 +129,7 @@ export default function LessonPage({ params }: LessonPageProps) {
         const data = await api.getLesson(lessonId);
         setLesson(data);
         setExercisesQueue(data.exercises);
+        setTotalExercisesCount(data.exercises.length);
         
         if (attempt.hearts_remaining <= 0) {
           setShowHeartsModal(true);
@@ -134,26 +144,16 @@ export default function LessonPage({ params }: LessonPageProps) {
     initLesson();
   }, [lessonId, reconcileHearts]);
 
-  // Handle speaker click for Spanish Text-to-Speech
-  const handleSpeak = () => {
-    if (!currentExercise) return;
-    const data = currentExercise.data;
-    let textToSpeak = '';
-
-    if (currentExercise.type === 'translate') {
-      textToSpeak = Array.isArray(data.answer) ? data.answer.join(' ') : data.answer;
-    } else if (currentExercise.type === 'fill_blank') {
-      textToSpeak = data.prompt.replace('___', data.answer);
-    } else if (currentExercise.type === 'type_answer') {
-      textToSpeak = data.answer;
-    } else if (currentExercise.type === 'multiple_choice') {
-      textToSpeak = data.answer;
-    } else {
-      textToSpeak = currentExercise.data.prompt;
+  // Handle speaker click for Text-to-Speech
+  const handleSpeak = (text?: string, lang?: 'es' | 'en') => {
+    if (typeof text === 'string') {
+      speech.speak(text, lang);
+      return;
     }
-
-    if (textToSpeak) {
-      speech.speak(textToSpeak);
+    if (!currentExercise) return;
+    const promptText = currentExercise.data.prompt;
+    if (promptText) {
+      speech.speak(promptText);
     }
   };
 
@@ -166,25 +166,6 @@ export default function LessonPage({ params }: LessonPageProps) {
       .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?¿¡]/g, '') // remove punctuation
       .trim();
   };
-
-  // Trigger speak automatically on load of a new question
-  useEffect(() => {
-    if (exercisesQueue.length > 0 && currentIdx < exercisesQueue.length) {
-      const currentExercise = exercisesQueue[currentIdx];
-      const promptText = currentExercise?.data?.prompt || '';
-      
-      // Do not auto-play audio if the prompt is English-to-Spanish translation
-      if (promptText.toLowerCase().includes('translate:')) {
-        return;
-      }
-
-      // Small timeout to allow browser layout to complete
-      const timer = setTimeout(() => {
-        handleSpeak();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [currentIdx, exercisesQueue]);
 
   if (loading) {
     return (
@@ -208,7 +189,9 @@ export default function LessonPage({ params }: LessonPageProps) {
   }
 
   const currentExercise = exercisesQueue[currentIdx];
-  const progressPercent = Math.round((currentIdx / exercisesQueue.length) * 100);
+  const progressPercent = totalExercisesCount > 0 
+    ? Math.min(100, Math.round((completedCount / totalExercisesCount) * 100))
+    : 0;
 
   // Check correctness of answer client-side
   const checkAnswer = async () => {
@@ -242,6 +225,7 @@ export default function LessonPage({ params }: LessonPageProps) {
       sound.playCorrect();
       const nextStreak = correctStreak + 1;
       setCorrectStreak(nextStreak);
+      setCompletedCount(prev => prev + 1);
 
       // Trigger streak messages from Duo the Owl
       if (nextStreak === 2) {
@@ -257,6 +241,7 @@ export default function LessonPage({ params }: LessonPageProps) {
     } else {
       sound.playIncorrect();
       setCorrectStreak(0);
+      setMistakeCount(prev => prev + 1);
       
       // Add current exercise to failed list for mistakes review redo
       setFailedExercises((prev) => [...prev, currentExercise]);
@@ -361,7 +346,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   };
 
   if (showCompleteModal && completeStats) {
-    const accuracy = completeStats.perfect ? 100 : Math.round(((exercisesQueue.length - failedExercises.length) / Math.max(exercisesQueue.length, 1)) * 100);
+    const accuracy = completeStats.perfect ? 100 : Math.max(0, Math.round(((totalExercisesCount - mistakeCount) / Math.max(totalExercisesCount, 1)) * 100));
     return (
       <div style={{
         display: 'flex',
@@ -599,40 +584,36 @@ export default function LessonPage({ params }: LessonPageProps) {
           <X size={28} />
         </button>
         
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-          {correctStreak >= 2 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-              <img 
-                src="/icons/fire.svg" 
-                alt="Fire" 
-                className="flame-active"
-                style={{ width: '16px', height: '16px', objectFit: 'contain' }}
-              />
-              <span style={{ color: 'var(--color-orange)', fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-                {correctStreak} IN A ROW
-              </span>
-              <div 
-                style={{ 
-                  width: '50px', 
-                  height: '6px', 
-                  backgroundColor: 'rgba(255, 150, 0, 0.25)', 
-                  borderRadius: '3px',
-                  overflow: 'hidden'
-                }}
-              >
-                <div 
-                  style={{ 
-                    width: `${Math.min(100, (correctStreak / 10) * 100)}%`, 
-                    height: '100%', 
-                    backgroundColor: 'var(--color-orange)',
-                    transition: 'width 0.3s ease'
-                  }} 
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', position: 'relative' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '20px', width: '100%' }}>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-muted)' }}>
+              Question {currentIdx + 1} of {exercisesQueue.length}
+            </span>
+            {correctStreak >= 2 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', animation: 'pulse 1s infinite' }}>
+                <img 
+                  src="/icons/fire.svg" 
+                  alt="Fire" 
+                  className="flame-active"
+                  style={{ width: '18px', height: '18px', objectFit: 'contain' }}
                 />
+                <span style={{ color: '#ff9600', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                  {correctStreak} IN A ROW!
+                </span>
               </div>
-            </div>
-          )}
-          <div className="progress-bar-container" style={{ width: '100%' }}>
-            <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }} />
+            )}
+          </div>
+          <div className="progress-bar-container" style={{ width: '100%', height: '16px', flex: 'none', backgroundColor: 'var(--bg-secondary)', borderRadius: '999px', overflow: 'hidden', border: '2px solid var(--border-color)', position: 'relative' }}>
+            <div 
+              className="progress-bar-fill" 
+              style={{ 
+                width: `${progressPercent}%`, 
+                height: '100%',
+                backgroundColor: correctStreak >= 2 ? '#ff9600' : 'var(--color-green)', 
+                transition: 'width 0.3s ease, background-color 0.3s ease',
+                borderRadius: '999px'
+              }} 
+            />
           </div>
         </div>
         
@@ -670,9 +651,9 @@ export default function LessonPage({ params }: LessonPageProps) {
             </span>
           )}
           {/* TTS Speaker Icon Button */}
-          {currentExercise.type !== 'match_pairs' && (
+          {currentExercise.type !== 'match_pairs' && currentExercise.type !== 'translate' && (
             <button 
-              onClick={handleSpeak}
+              onClick={() => handleSpeak()}
               className="btn-3d btn-blue"
               style={{
                 borderRadius: '50%',
@@ -697,6 +678,7 @@ export default function LessonPage({ params }: LessonPageProps) {
           disabled={isAnswerChecked}
           isChecked={isAnswerChecked}
           isCorrect={isAnswerCorrect ?? undefined}
+          onSpeak={handleSpeak}
         />
       </main>
 
@@ -755,6 +737,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 setIsAnswerCorrect(false);
                 sound.playIncorrect();
                 setCorrectStreak(0);
+                setMistakeCount(prev => prev + 1);
                 setFailedExercises((prev) => [...prev, currentExercise]);
                 if (attemptId) {
                   api.submitAnswer(attemptId, currentExercise.id, null, false)

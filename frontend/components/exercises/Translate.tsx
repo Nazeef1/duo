@@ -10,11 +10,14 @@ interface TranslateProps {
   selectedAnswer: string[] | null;
   onChange: (answer: string[]) => void;
   disabled: boolean;
+  onSpeak?: (text: string, lang?: 'es' | 'en') => void;
 }
 
-export default function Translate({ data, selectedAnswer, onChange, disabled }: TranslateProps) {
+export default function Translate({ data, selectedAnswer, onChange, disabled, onSpeak }: TranslateProps) {
   // Store selected word bank indices
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+  const [shuffledWordBank, setShuffledWordBank] = useState<string[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   // Sync internal state if selectedAnswer is reset by parent
   useEffect(() => {
@@ -23,13 +26,26 @@ export default function Translate({ data, selectedAnswer, onChange, disabled }: 
     }
   }, [selectedAnswer]);
 
+  // Shuffle word bank on mount and when word_bank changes
+  useEffect(() => {
+    setMounted(true);
+    if (data.word_bank) {
+      const shuffled = [...data.word_bank];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      setShuffledWordBank(shuffled);
+    }
+  }, [data.word_bank]);
+
   const handleWordTap = (bankIdx: number) => {
     if (disabled) return;
     if (selectedIndices.includes(bankIdx)) return;
 
     const nextIndices = [...selectedIndices, bankIdx];
     setSelectedIndices(nextIndices);
-    onChange(nextIndices.map(idx => data.word_bank[idx]));
+    onChange(nextIndices.map(idx => shuffledWordBank[idx]));
   };
 
   const handleSlotTap = (slotIdx: number) => {
@@ -37,8 +53,42 @@ export default function Translate({ data, selectedAnswer, onChange, disabled }: 
 
     const nextIndices = selectedIndices.filter((_, idx) => idx !== slotIdx);
     setSelectedIndices(nextIndices);
-    onChange(nextIndices.map(idx => data.word_bank[idx]));
+    onChange(nextIndices.map(idx => shuffledWordBank[idx]));
   };
+
+  if (!mounted) {
+    return (
+      <div>
+        <h3 className="exercise-prompt" style={{ marginBottom: '24px' }}>Write this in English</h3>
+        
+        {/* Character + Speech bubble area */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '32px' }}>
+          <div style={{
+            position: 'relative',
+            backgroundColor: 'var(--bg-secondary)',
+            border: '2px solid var(--border-color)',
+            borderRadius: '16px',
+            padding: '14px 20px',
+            flex: 1,
+            maxWidth: '400px',
+            alignSelf: 'center'
+          }}>
+            <span style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-dark)' }}>
+              {data.prompt}
+            </span>
+          </div>
+        </div>
+
+        <div className="word-bank" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '32px', justifyContent: 'center' }}>
+          {data.word_bank.map((word, idx) => (
+            <button key={`${word}-${idx}`} type="button" disabled className="tap-word-btn" style={{ opacity: 0.5 }}>
+              {word}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -85,17 +135,20 @@ export default function Translate({ data, selectedAnswer, onChange, disabled }: 
         </div>
 
         {/* Speech bubble */}
-        <div style={{
-          position: 'relative',
-          backgroundColor: 'var(--bg-secondary)',
-          border: '2px solid var(--border-color)',
-          borderRadius: '16px',
-          padding: '14px 20px',
-          flex: 1,
-          maxWidth: '400px',
-          cursor: 'pointer',
-          alignSelf: 'center'
-        }}>
+        <div 
+          onClick={() => onSpeak?.(data.prompt, 'es')}
+          style={{
+            position: 'relative',
+            backgroundColor: 'var(--bg-secondary)',
+            border: '2px solid var(--border-color)',
+            borderRadius: '16px',
+            padding: '14px 20px',
+            flex: 1,
+            maxWidth: '400px',
+            cursor: 'pointer',
+            alignSelf: 'center'
+          }}
+        >
           {/* Speech bubble tail pointing to the left */}
           <div style={{
             position: 'absolute',
@@ -188,7 +241,7 @@ export default function Translate({ data, selectedAnswer, onChange, disabled }: 
                 cursor: disabled ? 'default' : 'pointer'
               }}
             >
-              {data.word_bank[bankIdx]}
+              {shuffledWordBank[bankIdx]}
             </button>
           ))}
         </div>
@@ -196,7 +249,7 @@ export default function Translate({ data, selectedAnswer, onChange, disabled }: 
 
       {/* Word Bank (Source Area) */}
       <div className="word-bank" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '32px', justifyContent: 'center' }}>
-        {data.word_bank.map((word, idx) => {
+        {shuffledWordBank.map((word, idx) => {
           const isUsed = selectedIndices.includes(idx);
           return (
             <button

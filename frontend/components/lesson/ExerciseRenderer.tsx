@@ -14,9 +14,10 @@ interface ExerciseRendererProps {
   disabled: boolean;
   isChecked?: boolean;
   isCorrect?: boolean;
+  onSpeak?: (text: string, lang?: 'es' | 'en') => void;
 }
 
-export default function ExerciseRenderer({ exercise, selectedAnswer, onChange, disabled, isChecked, isCorrect }: ExerciseRendererProps) {
+export default function ExerciseRenderer({ exercise, selectedAnswer, onChange, disabled, isChecked, isCorrect, onSpeak }: ExerciseRendererProps) {
   switch (exercise.type) {
     case 'multiple_choice':
       return (
@@ -27,6 +28,7 @@ export default function ExerciseRenderer({ exercise, selectedAnswer, onChange, d
           disabled={disabled}
           isChecked={isChecked}
           isCorrect={isCorrect}
+          onSpeak={onSpeak}
         />
       );
     case 'translate':
@@ -36,6 +38,7 @@ export default function ExerciseRenderer({ exercise, selectedAnswer, onChange, d
           selectedAnswer={selectedAnswer}
           onChange={onChange}
           disabled={disabled}
+          onSpeak={onSpeak}
         />
       );
     case 'match_pairs':

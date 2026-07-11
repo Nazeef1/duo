@@ -143,16 +143,35 @@ export const useUserStore = create<UserState>((set, get) => ({
   loadPreferences: () => {
     if (typeof window === 'undefined') return;
     
-    const soundVal = localStorage.getItem('pref_sound_effects');
-    const animVal = localStorage.getItem('pref_animations');
-    const motivVal = localStorage.getItem('pref_motivational_messages');
-    const themeVal = 'dark';
-    localStorage.setItem('pref_theme', 'dark');
+    let soundEffectsEnabled = true;
+    let animationsEnabled = true;
+    let motivationalMessagesEnabled = true;
+
+    try {
+      const soundVal = localStorage.getItem('pref_sound_effects');
+      if (soundVal !== null) soundEffectsEnabled = JSON.parse(soundVal);
+    } catch (e) {
+      console.warn("Failed to parse sound preferences, defaulting to true", e);
+    }
+
+    try {
+      const animVal = localStorage.getItem('pref_animations');
+      if (animVal !== null) animationsEnabled = JSON.parse(animVal);
+    } catch (e) {
+      console.warn("Failed to parse animation preferences, defaulting to true", e);
+    }
+
+    try {
+      const motivVal = localStorage.getItem('pref_motivational_messages');
+      if (motivVal !== null) motivationalMessagesEnabled = JSON.parse(motivVal);
+    } catch (e) {
+      console.warn("Failed to parse motivational preferences, defaulting to true", e);
+    }
 
     set({
-      soundEffectsEnabled: soundVal !== null ? JSON.parse(soundVal) : true,
-      animationsEnabled: animVal !== null ? JSON.parse(animVal) : true,
-      motivationalMessagesEnabled: motivVal !== null ? JSON.parse(motivVal) : true,
+      soundEffectsEnabled,
+      animationsEnabled,
+      motivationalMessagesEnabled,
       theme: 'dark',
     });
 
