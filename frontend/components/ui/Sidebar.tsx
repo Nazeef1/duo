@@ -32,9 +32,9 @@ export default function Sidebar() {
     <div className="sidebar">
       <Link href="/" className="sidebar-logo" style={{ display: 'flex', justifyContent: 'center', paddingLeft: '0px', marginBottom: '32px', width: '100%' }}>
         <img 
-          src="/mascot/duojump.png?v=5" 
+          src="/mascot/title.svg" 
           alt="duolingo" 
-          style={{ height: '48px', width: 'auto', objectFit: 'contain' }} 
+          style={{ height: '32px', width: 'auto', objectFit: 'contain' }} 
         />
       </Link>
       

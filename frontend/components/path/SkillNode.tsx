@@ -17,6 +17,7 @@ interface SkillNodeProps {
   isLocked?: boolean;
   activePopoverIndex?: number | null;
   setActivePopoverIndex?: (idx: number | null) => void;
+  themeColor?: string;
 }
 
 export default function SkillNode({ 
@@ -26,7 +27,8 @@ export default function SkillNode({
   chestId = '', 
   isLocked = false,
   activePopoverIndex = null,
-  setActivePopoverIndex = () => {}
+  setActivePopoverIndex = () => {},
+  themeColor = '#1cb0f6'
 }: SkillNodeProps) {
   const popoverOpen = activePopoverIndex === index;
   const [targetLessonId, setTargetLessonId] = useState<number | null>(null);
@@ -287,49 +289,104 @@ export default function SkillNode({
       </div>
 
       {popoverOpen && (
-        <div className="skill-popover">
-          <h4 className="skill-popover-title">{skill.title}</h4>
-          <p className="skill-popover-subtitle">
+        <div 
+          className="skill-popover"
+          style={{
+            ['--popover-bg' as any]: themeColor,
+            ['--popover-bg-dark' as any]: getThemeDark(themeColor),
+            color: '#ffffff'
+          }}
+        >
+          <h4 className="skill-popover-title" style={{ color: '#ffffff', margin: 0, fontSize: '18px', fontWeight: 800 }}>{skill.title}</h4>
+          <p 
+            className="skill-popover-subtitle" 
+            style={{ 
+              color: 'rgba(255, 255, 255, 0.9)', 
+              fontSize: '13px', 
+              fontWeight: 700, 
+              marginTop: '4px',
+              marginBottom: '16px' 
+            }}
+          >
             {isCompleted 
-              ? 'Skill completed!' 
+              ? 'Prove your proficiency with Legendary' 
               : `Lesson ${skill.crowns} of ${skill.total_lessons}`}
           </p>
           
           {loadingLesson ? (
-            <div style={{ padding: '8px', fontSize: '14px', color: 'var(--text-muted)' }}>
+            <div style={{ padding: '8px', fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>
               Loading lesson...
             </div>
           ) : targetLessonId ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
               {isCompleted ? (
                 <>
                   <Link 
                     href={`/lesson/${targetLessonId}?legendary=true`}
-                    className="btn-3d btn-blue"
-                    style={{ padding: '10px 16px', fontSize: '13px', width: '100%', backgroundColor: 'var(--color-purple)', borderColor: 'var(--color-purple)' }}
+                    className="btn-3d"
+                    style={{ 
+                      padding: '11px 16px', 
+                      fontSize: '13px', 
+                      width: '100%', 
+                      backgroundColor: '#ffc800', 
+                      color: '#ffffff',
+                      border: 'none',
+                      borderBottom: '4px solid #e6a100',
+                      borderRadius: '12px',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      textAlign: 'center',
+                      textDecoration: 'none'
+                    }}
                   >
-                    🏆 Legendary (+40 XP)
+                    Legendary +40 XP
                   </Link>
                   <Link 
                     href={`/lesson/${targetLessonId}`}
-                    className="btn-3d btn-gray"
-                    style={{ padding: '10px 16px', fontSize: '13px', width: '100%' }}
+                    className="btn-3d"
+                    style={{ 
+                      padding: '11px 16px', 
+                      fontSize: '13px', 
+                      width: '100%',
+                      backgroundColor: '#ffffff',
+                      color: themeColor,
+                      border: 'none',
+                      borderBottom: '4px solid #d9d9d9',
+                      borderRadius: '12px',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      textAlign: 'center',
+                      textDecoration: 'none'
+                    }}
                   >
-                    Review (+10 XP)
+                    Practice +10 XP
                   </Link>
                 </>
               ) : (
                 <Link 
                   href={`/lesson/${targetLessonId}`}
-                  className="btn-3d btn-green"
-                  style={{ padding: '10px 20px', fontSize: '14px', width: '100%' }}
+                  className="btn-3d"
+                  style={{ 
+                    padding: '12px 20px', 
+                    fontSize: '14px', 
+                    width: '100%',
+                    backgroundColor: '#ffffff',
+                    color: themeColor,
+                    border: 'none',
+                    borderBottom: '4px solid #d9d9d9',
+                    borderRadius: '12px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    textAlign: 'center',
+                    textDecoration: 'none'
+                  }}
                 >
                   Start +10 XP
                 </Link>
               )}
             </div>
           ) : (
-            <div style={{ fontSize: '13px', color: 'var(--color-red)' }}>
+            <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)' }}>
               No lessons available.
             </div>
           )}
@@ -337,4 +394,11 @@ export default function SkillNode({
       )}
     </div>
   );
+}
+
+// Darker shade logic for 3D bottom border of the themed popovers
+function getThemeDark(color: string): string {
+  if (color === '#1cb0f6') return '#1485ba'; // dark blue
+  if (color === '#a560e8') return '#843cd0'; // dark purple
+  return '#1485ba';
 }

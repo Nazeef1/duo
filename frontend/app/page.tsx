@@ -120,7 +120,7 @@ export default function LearnPage() {
 
                     // Render primary Skill Node
                     nodesToRender.push(
-                      <div key={`skill-wrapper-${skill.id}`} style={{ position: 'relative', transform: `translateX(${offset}px)` }}>
+                      <div key={`skill-wrapper-${skill.id}`} style={{ position: 'relative', transform: `translateX(${offset}px)`, zIndex: activePopoverIndex === currentIdx ? 99 : 1 }}>
                         {/* 1. Animated mascot Lily clapping GIF next to Unit 1, Skill 1 (right side empty space) */}
                         {unitIdx === 0 && skillIdx === 0 && (
                           <div 
@@ -249,6 +249,7 @@ export default function LearnPage() {
                           type="skill"
                           activePopoverIndex={activePopoverIndex}
                           setActivePopoverIndex={setActivePopoverIndex}
+                          themeColor={unitIdx === 0 ? '#1cb0f6' : '#a560e8'}
                         />
                       </div>
                     );
@@ -259,7 +260,7 @@ export default function LearnPage() {
                       flatIndex += 1;
                       const chestOffset = pattern[chestIdx % pattern.length];
                       nodesToRender.push(
-                        <div key={`chest-wrapper-1`} style={{ position: 'relative', transform: `translateX(${chestOffset}px)` }}>
+                        <div key={`chest-wrapper-1`} style={{ position: 'relative', transform: `translateX(${chestOffset}px)`, zIndex: activePopoverIndex === chestIdx ? 99 : 1 }}>
                           <SkillNode
                             key={`chest-unit1`}
                             index={chestIdx}
@@ -268,6 +269,7 @@ export default function LearnPage() {
                             isLocked={skill.status !== 'completed'}
                             activePopoverIndex={activePopoverIndex}
                             setActivePopoverIndex={setActivePopoverIndex}
+                            themeColor="#1cb0f6"
                           />
                         </div>
                       );
@@ -276,7 +278,7 @@ export default function LearnPage() {
                       flatIndex += 1;
                       const chestOffset = pattern[chestIdx % pattern.length];
                       nodesToRender.push(
-                        <div key={`chest-wrapper-2`} style={{ position: 'relative', transform: `translateX(${chestOffset}px)` }}>
+                        <div key={`chest-wrapper-2`} style={{ position: 'relative', transform: `translateX(${chestOffset}px)`, zIndex: activePopoverIndex === chestIdx ? 99 : 1 }}>
                           <SkillNode
                             key={`chest-unit2`}
                             index={chestIdx}
@@ -285,6 +287,7 @@ export default function LearnPage() {
                             isLocked={skill.status !== 'completed'}
                             activePopoverIndex={activePopoverIndex}
                             setActivePopoverIndex={setActivePopoverIndex}
+                            themeColor="#a560e8"
                           />
                         </div>
                       );
@@ -296,7 +299,7 @@ export default function LearnPage() {
                       flatIndex += 1;
                       const trophyOffset = pattern[trophyIdx % pattern.length];
                       nodesToRender.push(
-                        <div key={`trophy-wrapper-unit-${unit.id}`} style={{ position: 'relative', transform: `translateX(${trophyOffset}px)` }}>
+                        <div key={`trophy-wrapper-unit-${unit.id}`} style={{ position: 'relative', transform: `translateX(${trophyOffset}px)`, zIndex: activePopoverIndex === trophyIdx ? 99 : 1 }}>
                           <SkillNode
                             key={`trophy-unit-${unit.id}`}
                             index={trophyIdx}
@@ -304,6 +307,7 @@ export default function LearnPage() {
                             isLocked={skill.status !== 'completed'}
                             activePopoverIndex={activePopoverIndex}
                             setActivePopoverIndex={setActivePopoverIndex}
+                            themeColor={unitIdx === 0 ? '#1cb0f6' : '#a560e8'}
                           />
                         </div>
                       );

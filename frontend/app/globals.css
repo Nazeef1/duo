@@ -512,14 +512,14 @@ body {
 /* Floating status popover for skill nodes */
 .skill-popover {
   position: absolute;
-  background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  border-bottom: 5px solid var(--border-color);
+  background: var(--popover-bg, var(--bg-secondary));
+  border: 2px solid var(--popover-bg, var(--border-color));
+  border-bottom: 5px solid var(--popover-bg-dark, var(--popover-bg, var(--border-color)));
   border-radius: 16px;
   padding: 16px;
   width: 240px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  z-index: 50;
+  z-index: 100;
   top: 105px;
   left: 50%;
   transform: translateX(-50%);
@@ -534,9 +534,9 @@ body {
   position: absolute;
   width: 14px;
   height: 14px;
-  background: var(--bg-secondary);
-  border-left: 2px solid var(--border-color);
-  border-top: 2px solid var(--border-color);
+  background: var(--popover-bg, var(--bg-secondary));
+  border-left: 2px solid var(--popover-bg, var(--border-color));
+  border-top: 2px solid var(--popover-bg, var(--border-color));
   top: -9px;
   left: 50%;
   transform: translateX(-50%) rotate(45deg);
