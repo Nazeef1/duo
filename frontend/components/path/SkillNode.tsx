@@ -34,7 +34,7 @@ export default function SkillNode({
   const [targetLessonId, setTargetLessonId] = useState<number | null>(null);
   const [loadingLesson, setLoadingLesson] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
-
+  const [hovered, setHovered] = useState(false);
   const { openedChests, openChest } = useUserStore();
 
   const handleNodeClick = async () => {
@@ -102,9 +102,7 @@ export default function SkillNode({
           </div>
         </button>
 
-        <div className="skill-node-title" style={{ color: isLocked ? 'var(--text-muted)' : 'var(--text-dark)', fontSize: '13px' }}>
-          {isOpen ? 'Claimed' : 'Bonus Chest'}
-        </div>
+
 
         {popoverOpen && !isOpen && !isLocked && (
           <div className="skill-popover">
@@ -164,6 +162,8 @@ export default function SkillNode({
               setActivePopoverIndex(popoverOpen ? null : index);
             }
           }}
+          onMouseEnter={() => !isLocked && setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
           className="skill-node-circle"
           style={{ cursor: isLocked ? 'default' : 'pointer', border: 'none', background: 'none' }}
         >
@@ -172,7 +172,13 @@ export default function SkillNode({
             style={{
               backgroundColor: isLocked ? '#37464f' : themeColor,
               borderColor: isLocked ? '#202f36' : getThemeDark(themeColor),
-              boxShadow: isLocked ? '0 6px 0 #202f36' : `0 6px 0 ${getThemeDark(themeColor)}`,
+              boxShadow: isLocked 
+                ? '0 6px 0 #202f36' 
+                : hovered 
+                  ? `0 2px 0 ${getThemeDark(themeColor)}` 
+                  : `0 6px 0 ${getThemeDark(themeColor)}`,
+              transform: hovered && !isLocked ? 'translateY(4px)' : 'none',
+              transition: 'transform 0.1s ease, box-shadow 0.1s ease',
               width: '80px',
               height: '80px',
               borderRadius: '50%',
@@ -196,9 +202,6 @@ export default function SkillNode({
             )}
           </div>
         </button>
-        <div className="skill-node-title" style={{ color: isLocked ? 'var(--text-muted)' : 'var(--text-dark)', fontSize: '14px', fontWeight: '900' }}>
-          Unit Review
-        </div>
 
         {popoverOpen && !isLocked && (
           <div 
@@ -267,7 +270,11 @@ export default function SkillNode({
     return {
       backgroundColor: themeColor,
       borderColor: getThemeDark(themeColor),
-      boxShadow: `0 6px 0 ${getThemeDark(themeColor)}`
+      boxShadow: hovered 
+        ? `0 2px 0 ${getThemeDark(themeColor)}` 
+        : `0 6px 0 ${getThemeDark(themeColor)}`,
+      transform: hovered ? 'translateY(4px)' : 'none',
+      transition: 'transform 0.1s ease, box-shadow 0.1s ease'
     };
   };
 
@@ -277,6 +284,8 @@ export default function SkillNode({
     >
       <button 
         onClick={handleNodeClick}
+        onMouseEnter={() => skill.status !== 'locked' && setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         className={`skill-node-circle ${skill.status}`}
       >
         {skill.status === 'available' && (
@@ -341,9 +350,7 @@ export default function SkillNode({
         </div>
       </button>
 
-      <div className={`skill-node-title ${skill.status === 'locked' ? 'locked' : ''}`}>
-        {skill.title}
-      </div>
+
 
       {popoverOpen && (
         <div 

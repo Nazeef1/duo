@@ -19,6 +19,7 @@ export default function LearnPage() {
   const [activePopoverIndex, setActivePopoverIndex] = useState<number | null>(null);
   const [lilyBubbleOpen, setLilyBubbleOpen] = useState(false);
   const [duoBubbleOpen, setDuoBubbleOpen] = useState(false);
+  const [flagHovered, setFlagHovered] = useState(false);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -353,19 +354,90 @@ export default function LearnPage() {
         <div className="right-sidebar" style={{ top: '24px', height: 'calc(100vh - 48px)' }}>
           {/* Stats row at the top */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 8px 8px 8px', marginBottom: '12px' }}>
-            {/* Language Flag */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-dark)' }}>
+            {/* Language Flag with hover courses dropdown */}
+            <div 
+              style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-dark)' }}
+              onMouseEnter={() => setFlagHovered(true)}
+              onMouseLeave={() => setFlagHovered(false)}
+            >
               <img 
-                src="/icons/spain.png" 
+                src="/icons/spanish.svg" 
                 alt="Spanish" 
-                style={{ width: '32px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} 
+                style={{ width: '32px', height: '24px', borderRadius: '4px', objectFit: 'contain', cursor: 'pointer' }} 
               />
+
+              {flagHovered && (
+                <div 
+                  style={{
+                    position: 'absolute',
+                    top: '32px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: 'var(--bg-secondary)',
+                    border: '2px solid var(--border-color)',
+                    borderBottom: '5px solid var(--border-color)',
+                    borderRadius: '16px',
+                    padding: '16px',
+                    width: '220px',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
+                    zIndex: 110,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px'
+                  }}
+                >
+                  <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px', textAlign: 'left' }}>
+                    My Courses
+                  </span>
+                  <div 
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '10px 12px',
+                      backgroundColor: 'rgba(28, 176, 246, 0.1)',
+                      border: '2px solid #1cb0f6',
+                      borderRadius: '12px',
+                      cursor: 'default'
+                    }}
+                  >
+                    <img 
+                      src="/icons/spanish.svg" 
+                      alt="Spanish" 
+                      style={{ width: '28px', height: '22px', borderRadius: '4px', objectFit: 'contain' }} 
+                    />
+                    <span style={{ fontSize: '15px', fontWeight: 800, color: '#1cb0f6' }}>Spanish</span>
+                  </div>
+                  <div style={{ borderTop: '2px solid var(--border-color)', paddingTop: '8px' }}>
+                    <button 
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        fontSize: '13px',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        textTransform: 'uppercase'
+                      }}
+                      onClick={() => alert("More courses coming soon!")}
+                    >
+                      <span>+</span>
+                      <span>Add a new course</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Streak */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-orange)' }}>
               <img 
-                src="/icons/fire.png" 
+                src="/icons/fire.svg" 
                 alt="Streak" 
                 style={{ width: '26px', height: '26px', objectFit: 'contain' }} 
               />
@@ -375,7 +447,7 @@ export default function LearnPage() {
             {/* Gems */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-blue)' }}>
               <img 
-                src="/icons/gem.png" 
+                src="/icons/gems.svg" 
                 alt="Gems" 
                 style={{ width: '26px', height: '26px', objectFit: 'contain' }} 
               />
