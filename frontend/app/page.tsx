@@ -63,9 +63,25 @@ export default function LearnPage() {
 
   const handleRefill = async (e: React.MouseEvent) => {
     e.preventDefault();
-    setRefilling(true);
-    await refillHearts();
-    setRefilling(false);
+    if (hearts >= 5) {
+      alert("Hearts are already full!");
+      return;
+    }
+    if (gems < 350) {
+      alert("Insufficient gems! You need 350 gems to refill hearts.");
+      return;
+    }
+    if (window.confirm("Spend 350 gems to refill hearts?")) {
+      setRefilling(true);
+      try {
+        await refillHearts();
+        alert("Hearts refilled successfully!");
+      } catch (err: any) {
+        alert(err.message || "Failed to refill hearts");
+      } finally {
+        setRefilling(false);
+      }
+    }
   };
 
   // Calculate daily goal progress
@@ -121,8 +137,8 @@ export default function LearnPage() {
                     // Render primary Skill Node
                     nodesToRender.push(
                       <div key={`skill-wrapper-${skill.id}`} style={{ position: 'relative', transform: `translateX(${offset}px)`, zIndex: activePopoverIndex === currentIdx ? 99 : 1 }}>
-                        {/* 1. Animated mascot Lily clapping GIF next to Unit 1, Skill 3 (right side empty space - midway) */}
-                        {unitIdx === 0 && skillIdx === 2 && (
+                        {/* 1. Animated mascot Lily clapping GIF next to Unit 1, Skill 2 (right side empty space - midway) */}
+                        {unitIdx === 0 && skillIdx === 1 && (
                           <div 
                             onClick={(e) => {
                               e.stopPropagation();
@@ -192,7 +208,7 @@ export default function LearnPage() {
                             }}
                             style={{ 
                               position: 'absolute', 
-                              left: '-195px', 
+                              left: '-240px', 
                               top: '-30px', 
                               zIndex: 15, 
                               width: '190px', 
