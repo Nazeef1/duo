@@ -113,6 +113,18 @@ export default function LearnPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-primary)' }}>
+      {/* Solid mask overlay to hide scrolled elements in the top 24px margin */}
+      <div 
+        style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          height: '24px', 
+          backgroundColor: 'var(--bg-primary)', 
+          zIndex: 85 
+        }} 
+      />
       <div style={{ display: 'flex', flex: 1, maxWidth: '1040px', margin: '0 auto', width: '100%', padding: '0 24px' }}>
         
         {/* Winding Path Area */}
@@ -340,7 +352,7 @@ export default function LearnPage() {
         {/* Fixed Right Sidebar Widget Panels */}
         <div className="right-sidebar" style={{ top: '24px', height: 'calc(100vh - 48px)' }}>
           {/* Stats row at the top */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 8px 8px 8px', marginBottom: '12px' }}>
             {/* Language Flag */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-dark)' }}>
               <img 
@@ -400,7 +412,7 @@ export default function LearnPage() {
             style={{ 
               border: 'none', 
               borderRadius: '16px', 
-              padding: '20px', 
+              padding: '24px', 
               background: 'linear-gradient(135deg, #a560e8 0%, #7622c8 100%)',
               color: '#ffffff',
               boxShadow: '0 8px 16px rgba(165, 96, 232, 0.25)',
@@ -432,7 +444,7 @@ export default function LearnPage() {
                 <img 
                   src="/mascot/duosword.png" 
                   alt="Super Duo" 
-                  style={{ width: '68px', height: '68px', objectFit: 'contain' }} 
+                  style={{ width: '78px', height: '78px', objectFit: 'contain' }} 
                 />
               </div>
             </div>
@@ -470,7 +482,7 @@ export default function LearnPage() {
                 style={{ 
                   border: 'none', 
                   borderRadius: '16px', 
-                  padding: '20px', 
+                  padding: '24px', 
                   background: 'linear-gradient(135deg, #ff8a00 0%, #da1b60 100%)',
                   color: '#ffffff',
                   boxShadow: '0 8px 16px rgba(218, 27, 96, 0.25)' 
@@ -481,7 +493,7 @@ export default function LearnPage() {
                   <Link href="/leaderboard" style={{ fontSize: '12px', color: '#ffffff', fontWeight: 900, textDecoration: 'none', borderBottom: '1px dashed rgba(255,255,255,0.8)', opacity: 0.9 }}>VIEW LEAGUE</Link>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <div style={{ fontSize: '38px', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>🥉</div>
+                  <div style={{ fontSize: '48px', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>🥉</div>
                   <div>
                     <div style={{ fontSize: '15px', fontWeight: 900 }}>
                       You're ranked <span style={{ color: '#ffffff', textDecoration: 'underline' }}>#{myRank}</span>
@@ -502,30 +514,62 @@ export default function LearnPage() {
             style={{ 
               border: 'none', 
               borderRadius: '16px', 
-              padding: '20px', 
+              padding: '24px', 
               background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
               color: '#ffffff',
-              boxShadow: '0 8px 16px rgba(17, 153, 142, 0.25)' 
+              boxShadow: '0 8px 16px rgba(17, 153, 142, 0.25)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h4 style={{ fontSize: '18px', fontWeight: 900, color: '#ffffff', margin: 0 }}>Daily Quests</h4>
               <Link href="/quests" style={{ fontSize: '12px', color: '#ffffff', fontWeight: 900, textDecoration: 'none', borderBottom: '1px dashed rgba(255,255,255,0.8)', opacity: 0.9 }}>VIEW ALL</Link>
             </div>
             
+            {/* Quest 1: XP Quest */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               <img 
                 src="/icons/fire.png" 
                 alt="Streak Icon" 
-                style={{ width: '36px', height: '36px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }} 
+                style={{ width: '32px', height: '32px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }} 
               />
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '15px', fontWeight: 800 }}>Earn {dailyGoal} XP</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '6px' }}>
-                  <div className="progress-bar-container" style={{ height: '10px', flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.25)' }}>
+                <div style={{ fontSize: '14px', fontWeight: 800 }}>Earn {dailyGoal} XP</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+                  <div className="progress-bar-container" style={{ height: '8px', flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.25)' }}>
                     <div className="progress-bar-fill" style={{ width: `${dailyProgressPercent}%`, backgroundColor: '#ffc800' }} />
                   </div>
-                  <span style={{ fontSize: '13px', color: '#ffffff', fontWeight: 800 }}>{xp}/{dailyGoal}</span>
+                  <span style={{ fontSize: '12px', color: '#ffffff', fontWeight: 800 }}>{xp}/{dailyGoal}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quest 2: Time Quest */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <span style={{ fontSize: '28px', lineHeight: 1, filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>⏱️</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '14px', fontWeight: 800 }}>Spend 15 minutes learning</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+                  <div className="progress-bar-container" style={{ height: '8px', flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.25)' }}>
+                    <div className="progress-bar-fill" style={{ width: '66%', backgroundColor: '#1cb0f6' }} />
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#ffffff', fontWeight: 800 }}>10/15</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quest 3: Streak Quest */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <span style={{ fontSize: '28px', lineHeight: 1, filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>⚡</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '14px', fontWeight: 800 }}>Get 5 correct in a row</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+                  <div className="progress-bar-container" style={{ height: '8px', flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.25)' }}>
+                    <div className="progress-bar-fill" style={{ width: '60%', backgroundColor: '#ff9600' }} />
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#ffffff', fontWeight: 800 }}>3/5</span>
                 </div>
               </div>
             </div>
