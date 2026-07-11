@@ -157,9 +157,27 @@ export default function LessonPage({ params }: LessonPageProps) {
     }
   };
 
+  // Helper to normalize strings (ignoring accents, tildes, punctuation, casing, etc.)
+  const normalizeAnswer = (str: string): string => {
+    return (str || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // remove diacritics
+      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?¿¡]/g, '') // remove punctuation
+      .trim();
+  };
+
   // Trigger speak automatically on load of a new question
   useEffect(() => {
     if (exercisesQueue.length > 0 && currentIdx < exercisesQueue.length) {
+      const currentExercise = exercisesQueue[currentIdx];
+      const promptText = currentExercise?.data?.prompt || '';
+      
+      // Do not auto-play audio if the prompt is English-to-Spanish translation
+      if (promptText.toLowerCase().includes('translate:')) {
+        return;
+      }
+
       // Small timeout to allow browser layout to complete
       const timer = setTimeout(() => {
         handleSpeak();
@@ -208,11 +226,11 @@ export default function LessonPage({ params }: LessonPageProps) {
     } else if (currentExercise.type === 'match_pairs') {
       isCorrect = selectedAnswer === true;
     } else if (currentExercise.type === 'fill_blank') {
-      isCorrect = selectedAnswer === data.answer;
+      isCorrect = normalizeAnswer(selectedAnswer as string || '') === normalizeAnswer(data.answer);
     } else if (currentExercise.type === 'type_answer') {
-      const typed = (selectedAnswer as string || '').trim().toLowerCase();
-      const primaryAnswer = data.answer.toLowerCase();
-      const alternates = (data.accepted_alternates || []).map((a: string) => a.toLowerCase());
+      const typed = normalizeAnswer(selectedAnswer as string || '');
+      const primaryAnswer = normalizeAnswer(data.answer);
+      const alternates = (data.accepted_alternates || []).map((a: string) => normalizeAnswer(a));
       isCorrect = typed === primaryAnswer || alternates.includes(typed);
     }
 
@@ -583,9 +601,35 @@ export default function LessonPage({ params }: LessonPageProps) {
         
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
           {correctStreak >= 2 && (
-            <span style={{ color: 'var(--color-orange)', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-              {correctStreak} IN A ROW
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+              <img 
+                src="/icons/fire.svg" 
+                alt="Fire" 
+                className="flame-active"
+                style={{ width: '16px', height: '16px', objectFit: 'contain' }}
+              />
+              <span style={{ color: 'var(--color-orange)', fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                {correctStreak} IN A ROW
+              </span>
+              <div 
+                style={{ 
+                  width: '50px', 
+                  height: '6px', 
+                  backgroundColor: 'rgba(255, 150, 0, 0.25)', 
+                  borderRadius: '3px',
+                  overflow: 'hidden'
+                }}
+              >
+                <div 
+                  style={{ 
+                    width: `${Math.min(100, (correctStreak / 10) * 100)}%`, 
+                    height: '100%', 
+                    backgroundColor: 'var(--color-orange)',
+                    transition: 'width 0.3s ease'
+                  }} 
+                />
+              </div>
+            </div>
           )}
           <div className="progress-bar-container" style={{ width: '100%' }}>
             <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }} />
