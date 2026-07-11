@@ -208,8 +208,19 @@ export default function SkillNode({
               ['--popover-bg-dark' as any]: getThemeDark(themeColor)
             } as React.CSSProperties}
           >
-            <h4 className="skill-popover-title">Unit Review</h4>
-            <p className="skill-popover-subtitle">Practice unit exercises and test your skills!</p>
+            <h4 className="skill-popover-title" style={{ color: '#ffffff', margin: 0, fontSize: '18px', fontWeight: 800 }}>Unit Review</h4>
+            <p 
+              className="skill-popover-subtitle"
+              style={{
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: '13px',
+                fontWeight: 700,
+                marginTop: '4px',
+                marginBottom: '16px'
+              }}
+            >
+              Practice unit exercises and test your skills!
+            </p>
             <Link 
               href={`/lesson/${themeColor === '#1cb0f6' ? 4 : 10}?isUnitReview=true&unitId=${themeColor === '#1cb0f6' ? 1 : 2}`}
               className="btn-3d"

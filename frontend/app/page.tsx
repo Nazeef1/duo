@@ -116,7 +116,7 @@ export default function LearnPage() {
       <div style={{ display: 'flex', flex: 1, maxWidth: '1040px', margin: '0 auto', width: '100%', padding: '0 24px' }}>
         
         {/* Winding Path Area */}
-        <div className="path-layout" style={{ position: 'relative', flex: 1 }}>
+        <div className="path-layout" style={{ position: 'relative', flex: 1, paddingTop: '24px' }}>
           {pathData.units.map((unit, unitIdx) => {
             return (
               <div key={unit.id} style={{ marginBottom: '56px', position: 'relative' }}>

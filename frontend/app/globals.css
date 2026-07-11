@@ -299,7 +299,7 @@ body {
 /* Sticky Unit Section Headers positioned below topbar */
 .unit-header {
   position: sticky;
-  top: 0;
+  top: 24px;
   z-index: 30;
   background-color: var(--color-blue-dark);
   color: #ffffff;
