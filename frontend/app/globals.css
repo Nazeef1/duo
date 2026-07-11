@@ -1526,6 +1526,8 @@ input:checked + .slider:before {
   flex-direction: column;
   gap: 24px;
   overflow: visible;
+  align-self: flex-start;
+  z-index: 90;
 }
 
 @media (max-width: 1024px) {
