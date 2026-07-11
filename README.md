@@ -1,5 +1,7 @@
 # Duolingo Web App Clone
 
+**Live Demo:** [https://duo-neon-ten.vercel.app/](https://duo-neon-ten.vercel.app/)
+
 > [!IMPORTANT]
 > This application is built and provided for **demonstration and educational purposes only**.
 
